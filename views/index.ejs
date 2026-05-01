@@ -1,0 +1,1143 @@
+<%- include('partials/navbar') %>
+
+<!-- ============================================================
+     HERO SECTION
+     ============================================================ -->
+<section id="product" class="hero">
+  <canvas id="hero-canvas" class="hero__canvas"></canvas>
+
+  <!-- Ambient glows -->
+  <div class="hero__glow hero__glow--top"></div>
+  <div class="hero__glow hero__glow--bottom"></div>
+  <div class="hero__glow hero__glow--center"></div>
+
+  <!-- Subtle grid overlay -->
+  <div class="hero__grid-overlay"></div>
+
+  <div class="hero__content">
+
+    <!-- Announcement badge -->
+    <div class="anim-fade-up" data-delay="100">
+      <a href="#" class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        <span>Technology Solutions Partner</span>
+        <span class="hero__badge-sep">—</span>
+        <span class="hero__badge-highlight">Since 2021</span>
+        <i data-lucide="arrow-right" class="hero__badge-arrow"></i>
+      </a>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="hero__title anim-fade-up" data-delay="200">
+      We Build Intelligent Systems.<br />
+      <span class="hero__title--accent">You Focus on Growth.</span>
+    </h1>
+
+    <!-- Subheadline -->
+    <p class="hero__subtitle anim-fade-up" data-delay="350">
+      Qimora builds enterprise AI, software, and automation for scale.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="hero__buttons anim-fade-up" data-delay="500">
+      <a href="#portfolio" class="btn btn--primary btn--glow-orange btn--hero">
+        View Our Work
+        <i data-lucide="arrow-right"></i>
+      </a>
+      <a href="#contact" class="btn btn--ghost btn--hero">
+        <i data-lucide="message-circle" class="btn__icon-fill"></i>
+        Get in Touch
+      </a>
+    </div>
+
+    <!-- Trust line -->
+    <div class="hero__trust anim-fade-up" data-delay="620">
+      <span class="hero__trust-item">
+        <i data-lucide="code-2" class="hero__trust-icon"></i>
+        Full-Stack Development
+      </span>
+      <span class="hero__trust-sep"></span>
+      <span class="hero__trust-item">
+        <i data-lucide="cpu" class="hero__trust-icon"></i>
+        AI Integration
+      </span>
+      <span class="hero__trust-sep"></span>
+      <span class="hero__trust-item">
+        <i data-lucide="layers" class="hero__trust-icon"></i>
+        End-to-End Solutions
+      </span>
+    </div>
+
+    <!-- Stats -->
+    <div class="hero__stats anim-fade-up" data-delay="750">
+      <div class="hero__stat">
+        <div class="hero__stat-value">4<span class="hero__stat-plus">+</span></div>
+        <div class="hero__stat-label">Years of Experience</div>
+      </div>
+      <div class="hero__stat-divider"></div>
+      <div class="hero__stat">
+        <div class="hero__stat-value">7<span class="hero__stat-plus">+</span></div>
+        <div class="hero__stat-label">Projects Delivered</div>
+      </div>
+      <div class="hero__stat-divider"></div>
+      <div class="hero__stat">
+        <div class="hero__stat-value">12<span class="hero__stat-plus">+</span></div>
+        <div class="hero__stat-label">Satisfied Clients</div>
+      </div>
+      <div class="hero__stat-divider"></div>
+      <div class="hero__stat">
+        <div class="hero__stat-value">5</div>
+        <div class="hero__stat-label">Expert Team Members</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hero__bottom-fade"></div>
+</section>
+
+
+<!-- ============================================================
+     SERVICES SECTION
+     ============================================================ -->
+<section id="features" class="features">
+  <div class="features__container">
+
+    <div class="features__header anim-fade-up">
+      <span class="badge badge--blue">What We Do</span>
+      <h2 class="section-title">
+        Comprehensive Solutions to <span class="gradient-text--blue">Power Your Business</span>
+      </h2>
+      <p class="section-subtitle">
+        From concept to deployment, we deliver end-to-end technology solutions tailored to your unique business needs.
+      </p>
+    </div>
+
+    <div class="features__grid">
+      <%
+        const services = [
+          { icon: "cpu",           title: "AI-Powered Systems",       color: "#FF9F43", desc: "Intelligent enterprise solutions with machine learning integration, predictive analytics, and smart automation that transform how your business operates." },
+          { icon: "code-2",        title: "Custom Software",          color: "#3B5BFF", desc: "Bespoke software applications built from the ground up to solve your specific challenges — scalable, secure, and designed for long-term success." },
+          { icon: "smartphone",    title: "Mobile & Desktop Apps",    color: "#FF9F43", desc: "Native and cross-platform applications for iOS, Android, Windows, and macOS — delivering seamless user experiences across all devices." },
+          { icon: "graduation-cap",title: "E-Learning Platforms",     color: "#3B5BFF", desc: "Complete learning management systems with interactive content delivery, progress tracking, assessments, and certification management." },
+          { icon: "workflow",      title: "Automation Solutions",     color: "#FF9F43", desc: "Streamline operations with intelligent workflow automation — from attendance systems to inventory management and business process optimization." },
+          { icon: "globe",         title: "Web Development",          color: "#3B5BFF", desc: "Modern, responsive websites and web applications built with cutting-edge technologies — fast, secure, and optimized for performance." }
+        ];
+      %>
+
+      <% services.forEach(function(s, i) { %>
+        <div class="feature-card anim-fade-up" data-delay="<%= i * 100 %>" data-color="<%= s.color %>">
+          <div class="feature-card__icon" style="background: <%= s.color %>18; border: 1px solid <%= s.color %>30;">
+            <i data-lucide="<%= s.icon %>" style="color: <%= s.color %>;"></i>
+          </div>
+          <h3 class="feature-card__title"><%= s.title %></h3>
+          <p class="feature-card__desc"><%= s.desc %></p>
+          <div class="feature-card__glow" style="background: radial-gradient(circle at top right, <%= s.color %>20, transparent 70%);"></div>
+        </div>
+      <% }); %>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ============================================================
+     PORTFOLIO SECTION
+     ============================================================ -->
+<section id="portfolio" class="pf2">
+
+  <!-- Background grid -->
+  <div class="pf2__grid-bg" aria-hidden="true">
+    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="pf2-grid" width="72" height="72" patternUnits="userSpaceOnUse">
+          <path d="M 72 0 L 0 0 0 72" fill="none" stroke="white" stroke-width="0.8"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#pf2-grid)"/>
+    </svg>
+  </div>
+
+  <div class="pf2__container">
+
+    <%
+      const pf2GlobalStats = [
+        { value: "7+",    label: "Projects Delivered" },
+        { value: "100%",  label: "Client Satisfaction" },
+        { value: "4+",    label: "Years Experience" },
+        { value: "12+",   label: "Tech Stacks" }
+      ];
+
+      var pf2Projects =
+        typeof portfolioProjects !== 'undefined' && portfolioProjects && portfolioProjects.length
+          ? portfolioProjects
+          : [];
+    %>
+
+    <!-- ── HEADER ── -->
+    <div class="pf2__header">
+      <div class="pf2__header-inner">
+
+        <!-- Left heading -->
+        <div class="pf2__heading-block">
+          <div class="pf2__eyebrow pf2-anim pf2-anim--eyebrow">
+            <i data-lucide="sparkles" class="pf2__eyebrow-icon"></i>
+            <span>Selected Work</span>
+          </div>
+
+          <h2 class="pf2__title pf2-anim pf2-anim--title">
+            Projects that<br/>
+            <span class="pf2__title-gradient">speak results.</span>
+          </h2>
+
+          <p class="pf2__subtitle pf2-anim pf2-anim--subtitle">
+            Each engagement is a strategic partnership — crafted with precision, built to scale, and measured by outcomes that matter.
+          </p>
+        </div>
+
+        <!-- Right stats -->
+        <div class="pf2__stats-grid">
+          <% pf2GlobalStats.forEach(function(s, si) { %>
+            <div class="pf2__stat-box pf2-anim pf2-anim--stat" data-pf2-delay="<%= 300 + si * 80 %>">
+              <span class="pf2__stat-value pf2-counter" data-value="<%= s.value %>"><%= s.value %></span>
+              <span class="pf2__stat-label"><%= s.label %></span>
+            </div>
+          <% }); %>
+        </div>
+
+      </div>
+
+      <!-- Divider -->
+      <div class="pf2__divider pf2-anim pf2-anim--divider"></div>
+    </div>
+
+    <!-- ── PROJECT CARDS ── -->
+    <div class="pf2__cards">
+
+      <% if (!pf2Projects.length) { %>
+        <p style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.45);padding:3rem 1rem;font-size:0.95rem;">
+          No published projects yet. Run <code style="color:#ff8949;">npm run seed</code> or add projects in <a href="/admin" style="color:#7c9bff;">/admin</a>.
+        </p>
+      <% } %>
+
+      <% pf2Projects.forEach(function(p, i) { %>
+        <div class="pf2-card pf2-card--anim <%= p.flip ? 'pf2-card--flip' : '' %>"
+             data-pf2-card-idx="<%= i %>"
+             style="--accent: <%= p.accent %>; --glow: <%= p.glow %>; --dim: <%= p.dim %>;">
+
+          <!-- Glow blob -->
+          <div class="pf2-card__blob" style="background: radial-gradient(circle, <%= p.glow %> 0%, transparent 70%);"></div>
+
+          <div class="pf2-card__inner">
+
+            <!-- Image side -->
+            <div class="pf2-card__img-side">
+              <% if (p.image) { %>
+              <img src="<%= p.image %>" alt="<%= p.title %>" class="pf2-card__img" loading="lazy"/>
+              <% } else { %>
+              <div class="pf2-card__img pf2-card__img-placeholder" aria-hidden="true"></div>
+              <% } %>
+
+              <!-- Gradient overlay -->
+              <div class="pf2-card__img-overlay <%= p.flip ? 'pf2-card__img-overlay--flip' : '' %>"></div>
+              <div class="pf2-card__img-overlay-mobile"></div>
+
+              <!-- Floating index watermark -->
+              <div class="pf2-card__index" style="color: <%= p.accent %>; <%= p.flip ? 'left:16px;right:auto;' : 'right:16px;left:auto;' %>">
+                <%= p.index %>
+              </div>
+
+              <!-- Year badge -->
+              <div class="pf2-card__year-badge pf2-card__year-badge--anim"><%= p.year %></div>
+            </div>
+
+            <!-- Content side -->
+            <div class="pf2-card__content">
+
+              <!-- Category -->
+              <div class="pf2-card__category pf2-card__row--anim" data-row-delay="0">
+                <span class="pf2-card__category-line" style="background: <%= p.accent %>;"></span>
+                <span class="pf2-card__category-text" style="color: <%= p.accent %>;"><%= p.category %></span>
+              </div>
+
+              <!-- Title -->
+              <h3 class="pf2-card__title pf2-card__row--anim" data-row-delay="60"><%= p.title %></h3>
+
+              <!-- Description -->
+              <p class="pf2-card__desc pf2-card__row--anim" data-row-delay="120"><%= p.description %></p>
+
+              <!-- Metrics -->
+              <div class="pf2-card__metrics pf2-card__row--anim" data-row-delay="180">
+                <% p.metrics.forEach(function(m) { %>
+                  <div class="pf2-card__metric">
+                    <span class="pf2-card__metric-value" style="color: <%= p.accent %>;"><%= m.v %></span>
+                    <span class="pf2-card__metric-label"><%= m.l %></span>
+                  </div>
+                <% }); %>
+              </div>
+
+              <!-- Tags -->
+              <div class="pf2-card__tags pf2-card__row--anim" data-row-delay="240">
+                <% p.tags.forEach(function(tag, ti) { %>
+                  <span class="pf2-card__tag pf2-card__tag--anim" data-tag-delay="<%= ti * 50 %>"
+                        style="background: <%= p.dim %>; color: <%= p.accent %>; border-color: <%= p.accent %>28;">
+                    <%= tag %>
+                  </span>
+                <% }); %>
+              </div>
+
+              <!-- CTA button -->
+              <a href="/case-study/<%= p.id %>" class="pf2-card__btn pf2-card__row--anim" data-row-delay="340"
+                 style="border-color: <%= p.accent %>55; color: <%= p.accent %>;">
+                View Case Study
+                <i data-lucide="arrow-up-right" class="pf2-card__btn-icon"></i>
+              </a>
+
+            </div>
+
+          </div><!-- /.pf2-card__inner -->
+        </div>
+      <% }); %>
+
+    </div>
+
+    <!-- ── BOTTOM CTA ── -->
+    <div class="pf2__cta pf2-anim pf2-anim--cta">
+      <div class="pf2__cta-glow" aria-hidden="true"></div>
+      <p class="pf2__cta-eyebrow">Ready to build?</p>
+      <h3 class="pf2__cta-title">Have a project in mind?</h3>
+      <p class="pf2__cta-sub">
+        Let's turn your vision into a product that performs. We handle strategy, design, and engineering.
+      </p>
+      <div class="pf2__cta-btns">
+        <a href="#contact" class="btn btn--primary btn--lg pf2__cta-primary">
+          Start a Project
+          <i data-lucide="arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ============================================================
+     OUR PROCESS SECTION
+     ============================================================ -->
+<section id="how-it-works" class="how-it-works">
+  <div class="how-it-works__container">
+
+    <div class="how-it-works__header anim-fade-up">
+      <span class="badge badge--orange">Our Process</span>
+      <h2 class="section-title">
+        From Vision to Reality in <span class="gradient-text--orange">Five Phases</span>
+      </h2>
+      <p class="section-subtitle">
+        A structured, transparent process — so you always know where your project stands.
+      </p>
+    </div>
+
+    <div class="process-timeline">
+      <div class="process-spine"></div>
+
+      <%
+        const steps = [
+          { num: "01", icon: "search",     color: "#3B5BFF", title: "Discovery & Analysis",  desc: "We audit your business requirements, map existing workflows, and surface opportunities for innovation and optimization." },
+          { num: "02", icon: "pen-tool",   color: "#FF9F43", title: "Design & Architecture", desc: "Detailed blueprints, wireframes, and system architecture ensure every layer of the solution aligns with your objectives." },
+          { num: "03", icon: "code-2",     color: "#3B5BFF", title: "Development & Testing", desc: "Agile sprints with continuous integration, automated testing, and demos keep you in control at every milestone." },
+          { num: "04", icon: "rocket",     color: "#FF9F43", title: "Launch & Deployment",   desc: "Zero-downtime production rollout with complete handover documentation and a dedicated go-live support window." },
+          { num: "05", icon: "refresh-cw", color: "#3B5BFF", title: "Maintenance & Updates", desc: "Ongoing monitoring, proactive updates, performance tuning, and feature enhancements — keeping your product ahead of the curve." }
+        ];
+      %>
+
+      <% steps.forEach(function(s, i) { %>
+        <% const side = i % 2 === 0 ? 'left' : 'right'; %>
+        <div class="tl-item tl-item--<%= side %> tl-slide-<%= side %>" data-delay="<%= i * 160 %>">
+
+          <!-- Content side -->
+          <div class="tl-content">
+            <div class="tl-phase-label" style="color: <%= s.color %>;">
+              <i data-lucide="<%= s.icon %>" class="tl-phase-icon"></i>
+              <span>Phase <%= s.num %></span>
+            </div>
+            <h3 class="tl-title"><%= s.title %></h3>
+            <p class="tl-desc"><%= s.desc %></p>
+            <div class="tl-underline" style="background: linear-gradient(90deg, <%= s.color %>, transparent);"></div>
+          </div>
+
+          <!-- Spacer (opposite side) -->
+          <div class="tl-spacer"></div>
+
+          <!-- Central node -->
+          <div class="tl-node" style="--c: <%= s.color %>; background: <%= s.color %>; box-shadow: 0 0 0 6px <%= s.color %>25, 0 0 28px <%= s.color %>50;">
+            <i data-lucide="<%= s.icon %>" class="tl-node__icon"></i>
+          </div>
+
+        </div>
+      <% }); %>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ============================================================
+     WHY CHOOSE US SECTION
+     ============================================================ -->
+<section id="about" class="benefits">
+  <div class="benefits__bg" aria-hidden="true"></div>
+  <div class="benefits__container">
+
+    <div class="benefits__intro anim-fade-up">
+      <span class="badge badge--blue benefits__badge">Why Choose Qimora</span>
+      <h2 class="benefits__headline">
+        Your Technology Partner for <span class="gradient-text--orange">Lasting Success</span>
+      </h2>
+    </div>
+
+    <div class="benefits__split">
+      <div class="benefits__col benefits__col--content anim-slide-right">
+        <div class="benefits__features" role="list">
+          <%
+            const benefitsList = [
+              { n: "01", text: "Named project leadership and clear ownership from kickoff to handover" },
+              { n: "02", text: "Structured reporting and a communication cadence that fits your stakeholders" },
+              { n: "03", text: "Documented, maintainable code and knowledge transfer for your team" },
+              { n: "04", text: "Post-launch support, monitoring, and incremental improvement options" },
+              { n: "05", text: "Engagement models tailored to scope, budget, and procurement needs" }
+            ];
+          %>
+          <% benefitsList.forEach(function(item, i) { %>
+            <article class="benefits-feature anim-benefit-card" data-delay="<%= 60 + i * 110 %>" role="listitem">
+              <div class="benefits-feature__badge" aria-hidden="true"><span><%= item.n %></span></div>
+              <p class="benefits-feature__text"><%= item.text %></p>
+            </article>
+          <% }); %>
+        </div>
+
+        <button type="button" class="benefits__cta" data-scroll="contact" aria-label="Start a conversation — go to contact">
+          <span class="benefits__cta-label">Start a Conversation</span>
+          <i data-lucide="arrow-right" class="benefits__cta-icon"></i>
+        </button>
+      </div>
+
+      <!-- Project showcase mockup -->
+      <div class="benefits__col benefits__col--mockup anim-slide-left">
+        <div class="benefits__mockup">
+          <div class="benefits__mockup-glow"></div>
+
+          <div class="dashboard">
+            <div class="dashboard__titlebar">
+              <div class="dashboard__dots">
+                <span class="dashboard__dot dashboard__dot--red"></span>
+                <span class="dashboard__dot dashboard__dot--yellow"></span>
+                <span class="dashboard__dot dashboard__dot--green"></span>
+              </div>
+              <div class="dashboard__url">
+                <span>qimora.tech/portfolio</span>
+              </div>
+            </div>
+
+            <div class="dashboard__body">
+              <div class="dashboard__header-row">
+                <div>
+                  <div class="dashboard__heading">Our Expertise</div>
+                  <div class="dashboard__subheading">Technologies & Capabilities</div>
+                </div>
+                <div class="dashboard__status-badge">✦ Full-Stack Excellence</div>
+              </div>
+
+              <div class="dashboard__metrics">
+                <div class="dashboard__metric">
+                  <div class="dashboard__metric-value" style="color: #FF9F43; text-shadow: 0 0 12px #FF9F4355;">100%</div>
+                  <div class="dashboard__metric-label">Project Delivery</div>
+                </div>
+                <div class="dashboard__metric">
+                  <div class="dashboard__metric-value" style="color: #3B5BFF; text-shadow: 0 0 12px #3B5BFF55;">24/7</div>
+                  <div class="dashboard__metric-label">Support Available</div>
+                </div>
+                <div class="dashboard__metric">
+                  <div class="dashboard__metric-value" style="color: #FF9F43; text-shadow: 0 0 12px #FF9F4355;">4+</div>
+                  <div class="dashboard__metric-label">Years Experience</div>
+                </div>
+              </div>
+
+              <div class="dashboard__chart">
+                <div class="dashboard__chart-header">
+                  <span>Project Success Rate</span>
+                  <span style="color: #FF9F43;">Excellent</span>
+                </div>
+                <div class="dashboard__bars" id="dashboard-bars">
+                  <% const barHeights = [85,90,88,95,92,98,94,96,100,98,100,100]; %>
+                  <% barHeights.forEach(function(h, i) { %>
+                    <div class="dashboard__bar<%= i === 11 ? ' dashboard__bar--accent' : '' %>" data-height="<%= h %>" style="height: 0%;"></div>
+                  <% }); %>
+                </div>
+              </div>
+
+              <div class="dashboard__services">
+                <% const capabilities = [{name:"Enterprise Systems",up:"Expert"},{name:"Mobile Development",up:"Expert"},{name:"AI Integration",up:"Expert"},{name:"Cloud Architecture",up:"Expert"}]; %>
+                <% capabilities.forEach(function(c) { %>
+                  <div class="dashboard__service">
+                    <div class="dashboard__service-left">
+                      <span class="dashboard__service-dot"></span>
+                      <span class="dashboard__service-name"><%= c.name %></span>
+                    </div>
+                    <span class="dashboard__service-uptime"><%= c.up %></span>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ============================================================
+     TEAM SECTION — expandable carousel (same interaction as React reference)
+     ============================================================ -->
+<section id="team" class="team team--carousel">
+  <div class="team__ambient" aria-hidden="true">
+    <div class="team__ambient-blob team__ambient-blob--1"></div>
+    <div class="team__ambient-blob team__ambient-blob--2"></div>
+    <div class="team__ambient-grid"></div>
+  </div>
+
+  <div class="team__container team__container--carousel">
+    <div class="team__intro">
+      <div class="team__header-block anim-fade-up">
+        <span class="badge badge--orange">Meet Our Team</span>
+        <h2 class="section-title">
+          The People Behind<br />
+          <span class="gradient-text--orange">Every Breakthrough</span>
+        </h2>
+      </div>
+    </div>
+
+    <%
+      const teamCarouselMembers = [
+        { id: 1, number: '01', name: 'Marcus Chen', role: 'Technical Lead', specialty: 'Full-Stack Architect', description: 'Pioneers next-gen scalable infrastructure across complex enterprise environments. Expert in AI integration and system architecture.', image: 'https://images.unsplash.com/photo-1633524418260-6cc5b2b1cd89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080', years: 10, projects: 58, bg: '#0A1428', bgGradient: 'linear-gradient(145deg, #0A1428 0%, #0D1A35 100%)', accent: '#3B5BFF', accentDim: 'rgba(59,91,255,0.12)', shape1: 'rgba(59,91,255,0.18)', shape2: 'rgba(30,50,120,0.25)', bgLight: '#EEF2FF', bgGradientLight: 'linear-gradient(145deg, #EEF2FF 0%, #E0E8FF 100%)', accentDimLight: 'rgba(59,91,255,0.08)', shape1Light: 'rgba(59,91,255,0.12)', shape2Light: 'rgba(30,50,120,0.1)' },
+        { id: 2, number: '02', name: 'Ryan Torres', role: 'Senior Developer', specialty: 'Backend & Cloud', description: 'Champion of distributed systems and microservices. Specializes in scalable backend architectures powering millions of requests.', image: 'https://images.unsplash.com/photo-1764545973653-94c40d993495?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080', years: 8, projects: 44, bg: '#140E22', bgGradient: 'linear-gradient(145deg, #140E22 0%, #1A1230 100%)', accent: '#FF9F43', accentDim: 'rgba(255,159,67,0.12)', shape1: 'rgba(255,159,67,0.18)', shape2: 'rgba(120,70,30,0.25)', bgLight: '#FFF7ED', bgGradientLight: 'linear-gradient(145deg, #FFF7ED 0%, #FFEDD5 100%)', accentDimLight: 'rgba(255,159,67,0.1)', shape1Light: 'rgba(255,159,67,0.15)', shape2Light: 'rgba(120,70,30,0.1)' },
+        { id: 3, number: '03', name: 'Yuki Nakamura', role: 'Mobile Developer', specialty: 'iOS & Android', description: 'Creates seamless cross-platform mobile experiences with exceptional performance. Passionate about native-feel app development.', image: 'https://images.unsplash.com/photo-1772987292949-4b1bdc01a612?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080', years: 6, projects: 31, bg: '#071E1E', bgGradient: 'linear-gradient(145deg, #071E1E 0%, #0A2A2A 100%)', accent: '#5B7DFF', accentDim: 'rgba(91,125,255,0.12)', shape1: 'rgba(91,125,255,0.18)', shape2: 'rgba(30,60,120,0.25)', bgLight: '#EFF6FF', bgGradientLight: 'linear-gradient(145deg, #EFF6FF 0%, #DBEAFE 100%)', accentDimLight: 'rgba(91,125,255,0.08)', shape1Light: 'rgba(91,125,255,0.12)', shape2Light: 'rgba(30,60,120,0.1)' },
+        { id: 4, number: '04', name: 'Jordan Miles', role: 'UI/UX Designer', specialty: 'Product & Design', description: 'Crafts beautiful, intuitive interfaces grounded in user psychology. Leads the design system and accessibility standards.', image: 'https://images.unsplash.com/photo-1758600588428-2cca8c96bfba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080', years: 7, projects: 39, bg: '#1F0B18', bgGradient: 'linear-gradient(145deg, #1F0B18 0%, #2A0F22 100%)', accent: '#FFB366', accentDim: 'rgba(255,179,102,0.12)', shape1: 'rgba(255,179,102,0.18)', shape2: 'rgba(140,70,40,0.25)', bgLight: '#FFFBEB', bgGradientLight: 'linear-gradient(145deg, #FFFBEB 0%, #FEF3C7 100%)', accentDimLight: 'rgba(255,179,102,0.1)', shape1Light: 'rgba(255,179,102,0.15)', shape2Light: 'rgba(140,70,40,0.1)' },
+        { id: 5, number: '05', name: 'Darius Webb', role: 'DevOps Engineer', specialty: 'Infrastructure & CI/CD', description: 'Automates deployment pipelines and maintains high-availability systems. Expert in cloud-native tooling and site reliability.', image: 'https://images.unsplash.com/photo-1549086802-bb458f399f05?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080', years: 9, projects: 52, bg: '#061910', bgGradient: 'linear-gradient(145deg, #061910 0%, #092216 100%)', accent: '#3B5BFF', accentDim: 'rgba(59,91,255,0.12)', shape1: 'rgba(59,91,255,0.18)', shape2: 'rgba(20,80,60,0.25)', bgLight: '#F0FDF4', bgGradientLight: 'linear-gradient(145deg, #F0FDF4 0%, #DCFCE7 100%)', accentDimLight: 'rgba(59,91,255,0.08)', shape1Light: 'rgba(59,91,255,0.12)', shape2Light: 'rgba(20,80,60,0.1)' },
+        { id: 6, number: '06', name: 'Sofia Martinez', role: 'Backend Developer', specialty: 'APIs & Microservices', description: 'Designs and builds high-performance RESTful and GraphQL APIs. Deep expertise in event-driven architecture and real-time systems.', image: 'https://images.unsplash.com/photo-1581092582520-3da64a3c0d4c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080', years: 5, projects: 27, bg: '#160F04', bgGradient: 'linear-gradient(145deg, #160F04 0%, #1E1608 100%)', accent: '#FF9F43', accentDim: 'rgba(255,159,67,0.12)', shape1: 'rgba(255,159,67,0.18)', shape2: 'rgba(120,80,20,0.25)', bgLight: '#FFFBEB', bgGradientLight: 'linear-gradient(145deg, #FFFBEB 0%, #FEF3C7 100%)', accentDimLight: 'rgba(255,159,67,0.1)', shape1Light: 'rgba(255,159,67,0.15)', shape2Light: 'rgba(120,80,20,0.1)' },
+        { id: 7, number: '07', name: 'Alex Brennan', role: 'Data Scientist', specialty: 'ML & Analytics', description: 'Turns complex datasets into actionable intelligence. Builds ML pipelines and predictive models that drive real business decisions.', image: 'https://images.unsplash.com/photo-1758691737646-79dbce8e25fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080', years: 6, projects: 33, bg: '#0C0B22', bgGradient: 'linear-gradient(145deg, #0C0B22 0%, #130F30 100%)', accent: '#6B8CFF', accentDim: 'rgba(107,140,255,0.12)', shape1: 'rgba(107,140,255,0.18)', shape2: 'rgba(50,45,120,0.25)', bgLight: '#EEF2FF', bgGradientLight: 'linear-gradient(145deg, #EEF2FF 0%, #E0E7FF 100%)', accentDimLight: 'rgba(107,140,255,0.08)', shape1Light: 'rgba(107,140,255,0.12)', shape2Light: 'rgba(50,45,120,0.1)' },
+        { id: 8, number: '08', name: 'Mei Lin', role: 'Product Manager', specialty: 'Strategy & Growth', description: 'Bridges engineering and business to ship products users love. Drives roadmap strategy, sprint planning, and stakeholder alignment.', image: 'https://images.unsplash.com/photo-1764795849885-e226e3cabe87?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080', years: 8, projects: 46, bg: '#051620', bgGradient: 'linear-gradient(145deg, #051620 0%, #071E2E 100%)', accent: '#FF943D', accentDim: 'rgba(255,148,61,0.12)', shape1: 'rgba(255,148,61,0.18)', shape2: 'rgba(100,70,30,0.25)', bgLight: '#FFF7ED', bgGradientLight: 'linear-gradient(145deg, #FFF7ED 0%, #FFEDD5 100%)', accentDimLight: 'rgba(255,148,61,0.1)', shape1Light: 'rgba(255,148,61,0.15)', shape2Light: 'rgba(100,70,30,0.1)' }
+      ];
+    %>
+
+    <script>
+      window.__TEAM_CAROUSEL__ = <%- JSON.stringify(teamCarouselMembers) %>;
+    </script>
+
+    <div class="team__carousel anim-fade-up" data-delay="120">
+      <span id="team-count-live" class="visually-hidden" aria-live="polite"></span>
+
+      <div class="team__rail team__rail--left">
+        <button type="button" class="team__arrow" id="team-prev" aria-label="Previous team members">
+          <i data-lucide="chevron-left"></i>
+        </button>
+        <div class="team__index-group">
+          <span class="team__index-num" id="team-count-current">—</span>
+          <span class="team__index-caption">selected</span>
+        </div>
+      </div>
+
+      <div class="team__cards-track">
+        <div class="team__cards-strip" id="team-strip">
+          <%
+            var perPage = 4;
+            var pages = [];
+            for (var pi = 0; pi < teamCarouselMembers.length; pi += perPage) {
+              pages.push(teamCarouselMembers.slice(pi, pi + perPage));
+            }
+          %>
+          <% pages.forEach(function(page, pageIdx) { %>
+          <div class="team__page" data-page="<%= pageIdx %>">
+            <div class="team__cards" role="list">
+              <% page.forEach(function(m, slotIdx) { %>
+                <% var globalIdx = pageIdx * perPage + slotIdx; %>
+              <article
+                class="team-mem"
+                role="listitem"
+                data-global="<%= globalIdx %>"
+                tabindex="0"
+                style="background: <%= m.bgGradient %>; --tm-accent: <%= m.accent %>; --tm-bg-solid: <%= m.bg %>; --tm-dim: <%= m.accentDim %>; --tm-shape1: <%= m.shape1 %>; --tm-shape2: <%= m.shape2 %>;"
+              >
+                <div class="team-mem__blob team-mem__blob--1"></div>
+                <div class="team-mem__blob team-mem__blob--2"></div>
+                <svg class="team-mem__star" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="<%= m.accent %>" d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+
+                <div class="team-mem__panel team-mem__panel--active">
+                  <div class="team-mem__watermark"><%= m.number %></div>
+                  <div class="team-mem__main">
+                    <div class="team-mem__spec-badge">
+                      <i data-lucide="briefcase" class="team-mem__spec-icon"></i>
+                      <span class="team-mem__specialty"><%= m.specialty %></span>
+                    </div>
+                    <h3 class="team-mem__name"><%= m.name %></h3>
+                    <div class="team-mem__stats">
+                      <div>
+                        <div class="team-mem__stat-val"><%= m.years %>+</div>
+                        <div class="team-mem__stat-lbl">Years Exp.</div>
+                      </div>
+                    </div>
+                    <p class="team-mem__desc"><%= m.description %></p>
+                    <div class="team-mem__socials">
+                      <a href="#" class="team-mem__social" aria-label="GitHub"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
+                      <a href="#" class="team-mem__social" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in" aria-hidden="true"></i></a>
+                      <a href="#" class="team-mem__social" aria-label="X"><i class="fa-brands fa-x-twitter" aria-hidden="true"></i></a>
+                    </div>
+                  </div>
+                  <div class="team-mem__photo-wrap">
+                    <img class="team-mem__photo" src="<%= m.image %>" alt="<%= m.name %>" loading="lazy" />
+                    <div class="team-mem__photo-fade"></div>
+                  </div>
+                </div>
+
+                <div class="team-mem__panel team-mem__panel--narrow">
+                  <div class="team-mem__narrow-num"><%= m.number %></div>
+                  <div class="team-mem__narrow-name"><%= m.name %></div>
+                  <div class="team-mem__narrow-dot"></div>
+                  <div class="team-mem__narrow-photo">
+                    <img src="<%= m.image %>" alt="" loading="lazy" />
+                    <div class="team-mem__narrow-fade"></div>
+                  </div>
+                </div>
+              </article>
+              <% }); %>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+
+      <div class="team__rail team__rail--right">
+        <div class="team__index-group">
+          <div class="team__index-row" aria-hidden="true">
+            <span class="team__index-sep">/</span>
+            <span class="team__index-num" id="team-count-total">8</span>
+          </div>
+          <span class="team__index-caption">total</span>
+        </div>
+        <button type="button" class="team__arrow" id="team-next" aria-label="Next team members">
+          <i data-lucide="chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="team__progress-row anim-fade-up" data-delay="200">
+      <div class="team__progress-bar">
+        <div class="team__progress-fill" id="team-progress-fill" style="width: 0%;"></div>
+      </div>
+      <div class="team__dots" id="team-dots" role="tablist" aria-label="Team members">
+        <% teamCarouselMembers.forEach(function(m, di) { %>
+          <button type="button" class="team__dot" data-index="<%= di %>" style="--dot-accent: <%= m.accent %>;" aria-label="Show <%= m.name %>"></button>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     CONTACT SECTION
+     ============================================================ -->
+<section id="contact" class="contact-section">
+  <canvas id="contact-canvas" class="hero__canvas contact-section__canvas" aria-hidden="true"></canvas>
+
+  <div class="hero__glow hero__glow--top" aria-hidden="true"></div>
+  <div class="hero__glow hero__glow--bottom" aria-hidden="true"></div>
+  <div class="hero__glow hero__glow--center" aria-hidden="true"></div>
+  <div class="hero__grid-overlay" aria-hidden="true"></div>
+
+  <div class="contact-section__inner">
+
+    <!-- ── LEFT — contact info ── -->
+    <div class="contact-info anim-fade-up" data-delay="0">
+
+      <div class="contact-info__label">Get in touch</div>
+      <h2 class="contact-info__title">
+        Let's Build Something<br />
+        <span class="gradient-text--orange">Extraordinary.</span>
+      </h2>
+      <p class="contact-info__lead">
+        Have a project in mind? Drop us a message and we'll get back to you within 3 hours.
+      </p>
+
+      <ul class="contact-info__list" aria-label="Contact channels">
+
+        <li class="contact-info__item">
+          <span class="contact-info__icon-wrap" aria-hidden="true">
+            <i data-lucide="phone"></i>
+          </span>
+          <div class="contact-info__detail">
+            <span class="contact-info__detail-label">Phone</span>
+            <a href="tel:+201156012078" class="contact-info__detail-value">+20 115 601 2078</a>
+     
+          </div>
+        </li>
+
+        <li class="contact-info__item">
+          <span class="contact-info__icon-wrap" aria-hidden="true">
+            <i data-lucide="mail"></i>
+          </span>
+          <div class="contact-info__detail">
+            <span class="contact-info__detail-label">Email</span>
+            <a href="mailto:info@qimora.io" class="contact-info__detail-value">info@qimora.io</a>
+      
+          </div>
+        </li>
+
+        <li class="contact-info__item">
+          <span class="contact-info__icon-wrap contact-info__icon-wrap--wa" aria-hidden="true">
+            <i class="fa-brands fa-whatsapp"></i>
+          </span>
+          <div class="contact-info__detail">
+            <span class="contact-info__detail-label">WhatsApp</span>
+            <a href="https://wa.me/201156012078" target="_blank" rel="noopener noreferrer" class="contact-info__detail-value">Chat on WhatsApp</a>
+          </div>
+        </li>
+
+      </ul>
+
+      <div class="contact-info__badges">
+        <span class="contact-info__badge"><i data-lucide="shield-check"></i>Free Consultation</span>
+        <span class="contact-info__badge"><i data-lucide="clock"></i>3h Response</span>
+        <span class="contact-info__badge"><i data-lucide="lock"></i>100% Confidential</span>
+      </div>
+
+    </div>
+
+    <!-- ── RIGHT — tabbed contact panel ── -->
+    <div class="contact-form-wrap anim-fade-up" data-delay="120">
+
+      <!-- Tab switcher -->
+      <div class="ctab__switcher" role="tablist" aria-label="Contact options">
+        <button class="ctab__btn ctab__btn--active" id="ctab-msg-btn" role="tab" aria-selected="true" aria-controls="ctab-msg" data-tab="msg">
+          <i data-lucide="send" aria-hidden="true"></i>
+          Send Message
+        </button>
+        <button class="ctab__btn" id="ctab-book-btn" role="tab" aria-selected="false" aria-controls="ctab-book" data-tab="book">
+          <i data-lucide="calendar" aria-hidden="true"></i>
+          Book Meeting
+        </button>
+      </div>
+
+      <!-- ══ TAB 1 — Send Message ══ -->
+      <div class="ctab__panel ctab__panel--active" id="ctab-msg" role="tabpanel" aria-labelledby="ctab-msg-btn">
+      <form class="contact-form" id="contact-form" novalidate autocomplete="off">
+
+        <div id="cf-form-panel" class="form-stack">
+        <div class="contact-form__row contact-form__row--2col">
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="cf-name">
+              Full Name <span class="contact-form__required" aria-hidden="true">*</span>
+            </label>
+            <div class="contact-form__input-wrap">
+              <i data-lucide="user" class="contact-form__input-icon" aria-hidden="true"></i>
+              <input
+                class="contact-form__input"
+                type="text"
+                id="cf-name"
+                name="name"
+                placeholder="John Smith"
+                required
+                autocomplete="name"
+                aria-required="true"
+              />
+            </div>
+            <span class="contact-form__error" id="cf-name-err" role="alert"></span>
+          </div>
+
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="cf-company">
+              Company <span class="contact-form__optional">(optional)</span>
+            </label>
+            <div class="contact-form__input-wrap">
+              <i data-lucide="building-2" class="contact-form__input-icon" aria-hidden="true"></i>
+              <input
+                class="contact-form__input"
+                type="text"
+                id="cf-company"
+                name="company"
+                placeholder="Your company"
+                autocomplete="organization"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form__field">
+          <label class="contact-form__label" for="cf-email">
+            Email Address <span class="contact-form__required" aria-hidden="true">*</span>
+          </label>
+          <div class="contact-form__input-wrap">
+            <i data-lucide="mail" class="contact-form__input-icon" aria-hidden="true"></i>
+            <input
+              class="contact-form__input"
+              type="email"
+              id="cf-email"
+              name="email"
+              placeholder="you@company.com"
+              required
+              autocomplete="email"
+              aria-required="true"
+            />
+          </div>
+          <span class="contact-form__error" id="cf-email-err" role="alert"></span>
+        </div>
+
+        <!-- WhatsApp toggle -->
+        <div class="contact-form__field">
+          <div class="cf-wa__toggle-row">
+            <label class="cf-wa__toggle-label" for="cf-wa-toggle">
+              <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+              Available on WhatsApp?
+            </label>
+            <button type="button" class="cf-wa__toggle" id="cf-wa-toggle" role="switch" aria-checked="false" aria-label="I have WhatsApp on this number">
+              <span class="cf-wa__toggle-knob"></span>
+            </button>
+          </div>
+          <div class="cf-wa__phone-wrap" id="cf-wa-phone-wrap" hidden>
+            <div class="contact-form__input-wrap">
+              <i class="fa-brands fa-whatsapp contact-form__input-icon" aria-hidden="true" style="color:#25D366"></i>
+              <input class="contact-form__input" type="tel" id="cf-wa-phone" name="whatsapp" placeholder="+1 (234) 567-890" autocomplete="tel" />
+            </div>
+            <span class="cf-wa__hint">We'll reach you via WhatsApp at this number.</span>
+          </div>
+        </div>
+
+        <div class="contact-form__field">
+          <label class="contact-form__label" for="cf-subject">
+            Subject <span class="contact-form__required" aria-hidden="true">*</span>
+          </label>
+          <div class="contact-form__input-wrap contact-form__input-wrap--select">
+            <i data-lucide="layers" class="contact-form__input-icon" aria-hidden="true"></i>
+            <select class="contact-form__input contact-form__select" id="cf-subject" name="subject" required aria-required="true">
+              <option value="" disabled selected>Select a topic…</option>
+              <optgroup label="Development">
+                <option value="web-dev">Website Development</option>
+                <option value="mobile-app">Mobile App Development (iOS / Android)</option>
+                <option value="fullstack">Full-Stack Web Application</option>
+                <option value="ecommerce">E-Commerce Platform</option>
+                <option value="api">API / Backend Development</option>
+                <option value="saas">SaaS Product Development</option>
+              </optgroup>
+              <optgroup label="Design">
+                <option value="ui-ux">UI / UX Design</option>
+                <option value="branding">Brand Identity & Logo</option>
+                <option value="prototyping">Prototyping & Wireframing</option>
+                <option value="design-system">Design System</option>
+              </optgroup>
+              <optgroup label="Cloud & Infrastructure">
+                <option value="devops">DevOps & CI/CD Pipeline</option>
+                <option value="cloud">Cloud Migration (AWS / Azure / GCP)</option>
+                <option value="hosting">Hosting & Server Setup</option>
+                <option value="security">Cybersecurity & Penetration Testing</option>
+              </optgroup>
+              <optgroup label="Data & AI">
+                <option value="data">Data Analytics & Dashboards</option>
+                <option value="ml">Machine Learning / AI Integration</option>
+                <option value="automation">Business Process Automation</option>
+              </optgroup>
+              <optgroup label="Consulting & Support">
+                <option value="consulting">Technical Consulting</option>
+                <option value="code-review">Code Review & Audit</option>
+                <option value="enterprise">Enterprise System Integration</option>
+                <option value="support">Ongoing Maintenance & Support</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="other">Other — I'll describe below</option>
+              </optgroup>
+            </select>
+            <i data-lucide="chevron-down" class="contact-form__select-chevron" aria-hidden="true"></i>
+          </div>
+          <span class="contact-form__error" id="cf-subject-err" role="alert"></span>
+        </div>
+
+        <!-- "Other" custom subject — revealed when user picks Other -->
+        <div class="contact-form__field" id="cf-other-wrap" hidden>
+          <label class="contact-form__label" for="cf-other-subject">
+            Describe your subject <span class="contact-form__required" aria-hidden="true">*</span>
+          </label>
+          <div class="contact-form__input-wrap">
+            <i data-lucide="pencil" class="contact-form__input-icon" aria-hidden="true"></i>
+            <input
+              class="contact-form__input"
+              type="text"
+              id="cf-other-subject"
+              name="other_subject"
+              placeholder="Tell us what you need…"
+              autocomplete="off"
+            />
+          </div>
+          <span class="contact-form__error" id="cf-other-err" role="alert"></span>
+        </div>
+
+        <div class="contact-form__field">
+          <label class="contact-form__label" for="cf-message">
+            Message <span class="contact-form__required" aria-hidden="true">*</span>
+          </label>
+          <div class="contact-form__input-wrap contact-form__input-wrap--textarea">
+            <i data-lucide="message-square" class="contact-form__input-icon contact-form__input-icon--ta" aria-hidden="true"></i>
+            <textarea
+              class="contact-form__input contact-form__textarea"
+              id="cf-message"
+              name="message"
+              placeholder="Tell us about your project — goals, timeline, budget…"
+              rows="5"
+              required
+              aria-required="true"
+            ></textarea>
+          </div>
+          <span class="contact-form__error" id="cf-message-err" role="alert"></span>
+        </div>
+
+        <button type="submit" class="contact-form__submit" id="cf-submit">
+          <span class="contact-form__submit-text">Send Message</span>
+          <i data-lucide="send" class="contact-form__submit-icon"></i>
+          <span class="contact-form__submit-spinner" aria-hidden="true"></span>
+        </button>
+
+        <p class="contact-form__privacy">
+          <i data-lucide="lock" aria-hidden="true"></i>
+          Your information is private and will never be shared.
+        </p>
+
+        <div class="contact-form__toast contact-form__toast--error" id="cf-toast-err" role="alert" hidden>
+          <i data-lucide="alert-circle"></i>
+          <span id="cf-toast-err-msg">Something went wrong. Please try again or email us directly.</span>
+        </div>
+        </div><!-- /cf-form-panel -->
+
+        <div class="form-success" id="cf-success" role="status" aria-live="polite" hidden>
+          <div class="form-success__glow" aria-hidden="true"></div>
+          <div class="form-success__icon-ring">
+            <i data-lucide="check" class="form-success__check-ico" aria-hidden="true"></i>
+          </div>
+          <h3 class="form-success__title">Message received</h3>
+          <p class="form-success__lead">Thank you for contacting Qimora.</p>
+          <p class="form-success__detail">
+            Please check your email — we've sent a confirmation to the address you provided.
+            Our team will review your inquiry and respond within three business hours.
+          </p>
+          <button type="button" class="form-success__again" id="cf-success-reset">Send another message</button>
+        </div>
+
+      </form>
+      </div><!-- /ctab-msg -->
+
+      <!-- ══ TAB 2 — Book Meeting ══ -->
+      <div class="ctab__panel" id="ctab-book" role="tabpanel" aria-labelledby="ctab-book-btn" hidden>
+        <form class="contact-form bk-form" id="book-form" novalidate autocomplete="off">
+
+        <div id="bk-form-panel" class="form-stack bk-form-stack">
+          <!-- Calendar -->
+          <div class="bk-cal">
+            <div class="bk-cal__header">
+              <button type="button" class="bk-cal__nav" id="bk-prev" aria-label="Previous month">
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <span class="bk-cal__month-label" id="bk-month-label"></span>
+              <button type="button" class="bk-cal__nav" id="bk-next" aria-label="Next month">
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+            <div class="bk-cal__dow-row" aria-hidden="true">
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div class="bk-cal__grid" id="bk-cal-grid" role="grid" aria-label="Meeting date picker"></div>
+            <div class="bk-cal__legend">
+              <span class="bk-cal__leg-dot bk-cal__leg-dot--booked"></span><span>Fully booked</span>
+              <span class="bk-cal__leg-dot bk-cal__leg-dot--partial"></span><span>Slots taken</span>
+              <span class="bk-cal__leg-dot bk-cal__leg-dot--selected"></span><span>Selected</span>
+              <span class="bk-cal__leg-dot bk-cal__leg-dot--today"></span><span>Today</span>
+            </div>
+          </div>
+
+          <!-- Already-booked notice -->
+          <div class="bk-booked-notice" id="bk-booked-notice" hidden>
+            <i data-lucide="calendar-x"></i>
+            <div>
+              <strong>Day fully booked</strong>
+              <span>All slots are taken on this day. Pick another date.</span>
+            </div>
+          </div>
+
+          <!-- Timezone + slots — revealed after free day chosen -->
+          <div class="bk-slots-wrap" id="bk-slots-wrap" hidden>
+            <div class="contact-form__field">
+              <label class="contact-form__label" for="bk-tz-search">
+                <i data-lucide="search" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
+                Search timezone
+              </label>
+              <div class="contact-form__input-wrap">
+                <i data-lucide="search" class="contact-form__input-icon" aria-hidden="true"></i>
+                <input class="contact-form__input" type="search" id="bk-tz-search" placeholder="City, country, or region — narrows the list below (e.g. Tokyo, Cairo, São Paulo)" autocomplete="off" aria-describedby="bk-tz-hint" />
+              </div>
+              <p class="cf-wa__hint" id="bk-tz-hint" style="margin-top:6px;">
+                Full IANA list from your browser. Search by city or region — approximate spelling is OK (e.g. “dubia” finds Dubai). Leave empty to scroll everything.
+              </p>
+            </div>
+            <div class="contact-form__field">
+              <label class="contact-form__label" for="bk-tz">
+                <i data-lucide="globe" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
+                Your timezone (IANA)
+              </label>
+              <div class="contact-form__input-wrap contact-form__input-wrap--select">
+                <i data-lucide="globe" class="contact-form__input-icon" aria-hidden="true"></i>
+                <select class="contact-form__input contact-form__select" id="bk-tz" name="timezone" aria-describedby="bk-tz-hint"></select>
+                <i data-lucide="chevron-down" class="contact-form__select-chevron" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="contact-form__field">
+              <label class="contact-form__label">
+                <i data-lucide="clock" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
+                Available Slots
+                <span class="bk-slots__tz-note" id="bk-tz-note"></span>
+              </label>
+              <div class="bk-slots__grid" id="bk-slots-grid" role="group" aria-label="Available time slots"></div>
+              <span class="contact-form__error" id="bk-slot-err" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Booking details — revealed after slot chosen -->
+          <div class="bk-details-wrap" id="bk-details-wrap" hidden>
+            <div class="bk-details__summary" id="bk-summary"></div>
+
+            <div class="contact-form__row contact-form__row--2col">
+              <div class="contact-form__field">
+                <label class="contact-form__label" for="bk-name">
+                  Full Name <span class="contact-form__required" aria-hidden="true">*</span>
+                </label>
+                <div class="contact-form__input-wrap">
+                  <i data-lucide="user" class="contact-form__input-icon" aria-hidden="true"></i>
+                  <input class="contact-form__input" type="text" id="bk-name" name="bk_name" placeholder="John Smith" required autocomplete="name" />
+                </div>
+                <span class="contact-form__error" id="bk-name-err" role="alert"></span>
+              </div>
+              <div class="contact-form__field">
+                <label class="contact-form__label" for="bk-company">
+                  Company <span class="contact-form__optional">(optional)</span>
+                </label>
+                <div class="contact-form__input-wrap">
+                  <i data-lucide="building-2" class="contact-form__input-icon" aria-hidden="true"></i>
+                  <input class="contact-form__input" type="text" id="bk-company" name="bk_company" placeholder="Your company" autocomplete="organization" />
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-form__field">
+              <label class="contact-form__label" for="bk-email">
+                Email Address <span class="contact-form__required" aria-hidden="true">*</span>
+              </label>
+              <div class="contact-form__input-wrap">
+                <i data-lucide="mail" class="contact-form__input-icon" aria-hidden="true"></i>
+                <input class="contact-form__input" type="email" id="bk-email" name="bk_email" placeholder="you@company.com" required autocomplete="email" />
+              </div>
+              <span class="contact-form__error" id="bk-email-err" role="alert"></span>
+            </div>
+
+            <div class="bk-email-active-wrap" id="bk-email-active-wrap" hidden>
+              <div class="bk-email-active-card">
+                <i data-lucide="calendar-clock" class="bk-email-active-card__ico" aria-hidden="true"></i>
+                <div class="bk-email-active-card__body">
+                  <strong class="bk-email-active-card__title">You already have a meeting</strong>
+                  <p class="bk-email-active-card__desc" id="bk-email-active-desc"></p>
+                  <div class="bk-email-active-card__choice" id="bk-email-active-choice">
+                    <button type="button" class="bk-email-active-btn bk-email-active-btn--primary" id="bk-reschedule-yes">
+                      Change my time
+                    </button>
+                    <button type="button" class="bk-email-active-btn bk-email-active-btn--ghost" id="bk-reschedule-no">
+                      I’ll use another email
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <p class="bk-reschedule-banner" id="bk-reschedule-banner" hidden>
+                <i data-lucide="arrow-right-circle" aria-hidden="true"></i>
+                <span>Pick a <strong>new time</strong> in the calendar above, then tap <strong>Update appointment</strong>.</span>
+              </p>
+            </div>
+
+            <!-- WhatsApp toggle for booking -->
+            <div class="contact-form__field">
+              <div class="cf-wa__toggle-row">
+                <label class="cf-wa__toggle-label" for="bk-wa-toggle">
+                  <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+                  Available on WhatsApp?
+                </label>
+                <button type="button" class="cf-wa__toggle" id="bk-wa-toggle" role="switch" aria-checked="false" aria-label="I have WhatsApp on this number">
+                  <span class="cf-wa__toggle-knob"></span>
+                </button>
+              </div>
+              <div class="cf-wa__phone-wrap" id="bk-wa-phone-wrap" hidden>
+                <div class="contact-form__input-wrap">
+                  <i class="fa-brands fa-whatsapp contact-form__input-icon" aria-hidden="true" style="color:#25D366"></i>
+                  <input class="contact-form__input" type="tel" id="bk-wa-phone" name="bk_whatsapp" placeholder="+1 (234) 567-890" autocomplete="tel" />
+                </div>
+                <span class="cf-wa__hint">We'll send your meeting confirmation on WhatsApp.</span>
+              </div>
+            </div>
+
+            <div class="contact-form__field">
+              <label class="contact-form__label" for="bk-reason">
+                Meeting Agenda <span class="contact-form__required" aria-hidden="true">*</span>
+              </label>
+              <div class="contact-form__input-wrap contact-form__input-wrap--textarea">
+                <i data-lucide="clipboard-list" class="contact-form__input-icon contact-form__input-icon--ta" aria-hidden="true"></i>
+                <textarea class="contact-form__input contact-form__textarea" id="bk-reason" name="bk_reason" placeholder="What's this meeting about? Goals, context, key questions…" rows="3" required></textarea>
+              </div>
+              <span class="contact-form__error" id="bk-reason-err" role="alert"></span>
+            </div>
+
+            <button type="submit" class="contact-form__submit" id="bk-submit">
+              <span class="contact-form__submit-text">Confirm Booking</span>
+              <i data-lucide="calendar-check" class="contact-form__submit-icon"></i>
+              <span class="contact-form__submit-spinner" aria-hidden="true"></span>
+            </button>
+            <p class="bk-submit-block-hint" id="bk-submit-block-hint" hidden role="status" aria-live="polite"></p>
+
+            <p class="contact-form__privacy">
+              <i data-lucide="lock" aria-hidden="true"></i>
+              After you submit, we’ll email you once your time is confirmed — that message will include your Google Meet link and time details.
+            </p>
+
+            <div class="contact-form__toast contact-form__toast--error" id="bk-toast-err" role="alert" hidden>
+              <i data-lucide="alert-circle"></i>
+              <span id="bk-toast-err-msg">Booking failed. Please try again or contact us directly.</span>
+            </div>
+
+          </div><!-- /bk-details-wrap -->
+
+        </div><!-- /bk-form-panel -->
+
+        <div class="form-success form-success--booking" id="bk-success" role="status" aria-live="polite" hidden>
+          <div class="form-success__glow form-success__glow--booking" aria-hidden="true"></div>
+          <div class="form-success__icon-ring">
+            <i data-lucide="calendar-check" class="form-success__check-ico" aria-hidden="true"></i>
+          </div>
+          <h3 class="form-success__title">Request received</h3>
+          <p class="form-success__lead">We’ve saved your preferred date and time.</p>
+          <p class="form-success__detail">
+            You’ll get an email from us as soon as we confirm your meeting. That message will include a <strong>Google Meet</strong> link and the final time in your timezone.
+            If you don’t see it within a day or two, check spam or promotions — or reach out through our contact form.
+          </p>
+          <button type="button" class="form-success__again" id="bk-success-reset">Book another meeting</button>
+        </div>
+
+        </form>
+      </div><!-- /ctab-book -->
+
+    </div><!-- /contact-form-wrap -->
+
+  </div>
+</section>
+
+<%- include('partials/footer') %>

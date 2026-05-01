@@ -1,0 +1,31 @@
+<!-- ============================================================
+     CASE-STUDY NAVBAR — Logo, on-page section nav, theme
+     ============================================================ -->
+<nav id="navbar" class="navbar navbar--cs" style="--cs-ac: <%= project.color %>;">
+  <div class="navbar__container">
+    <div class="navbar__inner">
+
+      <a href="/" class="navbar__logo" id="navbar-logo" aria-label="Back to Qimora home">
+        <img src="/images/icon.svg" alt="Qimora" class="navbar__logo-img" width="108" height="109" />
+      </a>
+
+      <div class="navbar-cs__tabs-outer">
+        <div class="navbar-cs__tabs-scroll" id="csPageNavScroll" role="navigation" aria-label="On this page">
+          <a href="#cs-top" class="navbar-cs__tab is-active" data-cs-page>Top</a>
+          <a href="#cs-overview" class="navbar-cs__tab" data-cs-page>Overview</a>
+          <a href="#cs-solution" class="navbar-cs__tab" data-cs-page>Solution</a>
+          <a href="#cs-results" class="navbar-cs__tab" data-cs-page>Results</a>
+          <a href="#cs-cta" class="navbar-cs__tab" data-cs-page>Contact</a>
+        </div>
+      </div>
+
+      <div class="navbar__actions navbar__actions--cs">
+        <button id="theme-toggle" class="navbar__theme-btn" aria-label="Toggle theme">
+          <i data-lucide="sun"  class="navbar__icon navbar__icon--sun"></i>
+          <i data-lucide="moon" class="navbar__icon navbar__icon--moon"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</nav>

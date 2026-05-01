@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/images/icon.svg" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body class="admin-body">
+<div class="admin-app">
+
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+
+    <!-- Top bar -->
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <span>Projects</span>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="admin-content">
+
+      <!-- Flash -->
+      <% if (flash && flash.msg) { %>
+        <div class="admin-flash admin-flash--<%= flash.type === 'err' ? 'err' : 'ok' %>">
+          <% if (flash.type === 'err') { %>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <% } else { %>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <% } %>
+          <%= flash.msg %>
+        </div>
+      <% } %>
+
+      <!-- Page header -->
+      <div class="admin-page-header">
+        <div>
+          <h1>Projects</h1>
+          <p>Manage portfolio projects and case studies published on the site.</p>
+        </div>
+        <a href="/admin/projects/new" class="a-btn a-btn--primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New project
+        </a>
+      </div>
+
+      <!-- Stats row -->
+      <div class="admin-stats-row">
+        <div class="admin-stat-card">
+          <div class="admin-stat-card__icon admin-stat-card__icon--orange">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="7" height="9" rx="1"/><rect x="15" y="3" width="7" height="5" rx="1"/><rect x="15" y="12" width="7" height="9" rx="1"/><rect x="2" y="16" width="7" height="5" rx="1"/></svg>
+          </div>
+          <div class="admin-stat-card__label">Total projects</div>
+          <div class="admin-stat-card__value"><%= projects ? projects.length : 0 %></div>
+          <div class="admin-stat-card__sub">in database</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-card__icon admin-stat-card__icon--green">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="admin-stat-card__label">Published</div>
+          <div class="admin-stat-card__value"><%= projects ? projects.filter(function(p){return p.isPublished;}).length : 0 %></div>
+          <div class="admin-stat-card__sub">live on site</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-card__icon admin-stat-card__icon--yellow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="admin-stat-card__label">Drafts</div>
+          <div class="admin-stat-card__value"><%= projects ? projects.filter(function(p){return !p.isPublished;}).length : 0 %></div>
+          <div class="admin-stat-card__sub">not visible</div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-card__icon admin-stat-card__icon--blue">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div class="admin-stat-card__label">With AI flag</div>
+          <div class="admin-stat-card__value"><%= projects ? projects.filter(function(p){return p.hasAI;}).length : 0 %></div>
+          <div class="admin-stat-card__sub">AI projects</div>
+        </div>
+      </div>
+
+      <!-- Inbox overview -->
+      <div class="admin-inbox-overview">
+        <div class="admin-inbox-overview__col">
+          <div class="admin-inbox-overview__head">
+            <h2>Recent messages</h2>
+            <a href="/admin/messages" class="a-btn a-btn--ghost a-btn--sm">View all</a>
+          </div>
+          <% if (!recentMessages || !recentMessages.length) { %>
+            <p class="admin-inbox-overview__empty">No messages yet.</p>
+          <% } else { %>
+            <ul class="admin-inbox-mini">
+              <% recentMessages.forEach(function(c) { %>
+                <li class="admin-inbox-mini__row">
+                  <div class="admin-inbox-mini__main">
+                    <span class="admin-inbox-mini__name"><%= c.name %></span>
+                    <span class="admin-inbox-mini__sub"><%= c.subject === 'other' && c.customSubject ? c.customSubject : (c.subject || '') %></span>
+                  </div>
+                  <span class="admin-inbox-mini__time"><%= c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '' %></span>
+                  <% if (c.read !== true) { %><span class="admin-inbox-mini__dot" title="Unread"></span><% } %>
+                </li>
+              <% }); %>
+            </ul>
+          <% } %>
+        </div>
+        <div class="admin-inbox-overview__col">
+          <div class="admin-inbox-overview__head">
+            <h2>Upcoming meetings</h2>
+            <a href="/admin/meetings" class="a-btn a-btn--ghost a-btn--sm">View all</a>
+          </div>
+          <% if (!upcomingMeetings || !upcomingMeetings.length) { %>
+            <p class="admin-inbox-overview__empty">No upcoming meetings.</p>
+          <% } else { %>
+            <ul class="admin-inbox-mini">
+              <% upcomingMeetings.forEach(function(m) { %>
+                <li class="admin-inbox-mini__row">
+                  <div class="admin-inbox-mini__main">
+                    <span class="admin-inbox-mini__name"><%= m.name %></span>
+                    <span class="admin-inbox-mini__sub">Guest <%= m.labelViewer %> · Cairo <%= m.labelCairo %></span>
+                  </div>
+                  <span class="admin-inbox-mini__time"><%= m.startsAt ? new Date(m.startsAt).toLocaleDateString() : '' %></span>
+                </li>
+              <% }); %>
+            </ul>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Projects grid -->
+      <% if (!projects || !projects.length) { %>
+        <div class="admin-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="7" height="9" rx="1"/><rect x="15" y="3" width="7" height="5" rx="1"/><rect x="15" y="12" width="7" height="9" rx="1"/><rect x="2" y="16" width="7" height="5" rx="1"/></svg>
+          <h3>No projects yet</h3>
+          <p>Run <code style="color:var(--a-orange);">npm run seed</code> to import default projects, or create one manually.</p>
+          <a href="/admin/projects/new" class="a-btn a-btn--primary">Create first project</a>
+        </div>
+      <% } else { %>
+        <div class="admin-grid">
+          <% projects.forEach(function(p) { %>
+            <article class="admin-card">
+              <div class="admin-card__thumb">
+                <% if (p.image) { %>
+                  <img src="<%= p.image %>" alt="" loading="lazy" />
+                <% } else { %>
+                  <div class="admin-card__thumb-empty">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  </div>
+                <% } %>
+                <div class="admin-card__accent-bar" style="background:<%= p.color || '#3B5BFF' %>;"></div>
+              </div>
+              <div class="admin-card__body">
+                <div class="admin-card__header">
+                  <h2 class="admin-card__title"><%= p.title %></h2>
+                  <span class="admin-badge <%= p.isPublished ? 'admin-badge--live' : 'admin-badge--draft' %>">
+                    <%= p.isPublished ? 'Live' : 'Draft' %>
+                  </span>
+                </div>
+                <div class="admin-card__meta">
+                  <span class="admin-card__color-dot" style="background:<%= p.color || '#3B5BFF' %>;"></span>
+                  /<%= p.slug %>
+                  <% if (p.category) { %>&ensp;·&ensp;<%= p.category %><% } %>
+                </div>
+                <div class="admin-card__meta" style="margin-top:2px;">
+                  Order&nbsp;<strong style="color:var(--a-text);"><%= p.order %></strong>
+                  <% if (p.hasAI) { %>&ensp;<span style="color:var(--a-orange);font-size:0.7rem;font-weight:700;">AI</span><% } %>
+                  <% if (p.hasMobileApp) { %>&ensp;<span style="color:var(--a-blue);font-size:0.7rem;font-weight:700;">MOBILE</span><% } %>
+                </div>
+                <div class="admin-card__actions">
+                  <a href="/admin/projects/<%= p._id %>/edit" class="a-btn a-btn--secondary a-btn--sm">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Edit
+                  </a>
+                  <form method="post" action="/admin/projects/<%= p._id %>/toggle-publish">
+                    <button type="submit" class="a-btn a-btn--ghost a-btn--sm">
+                      <% if (p.isPublished) { %>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        Unpublish
+                      <% } else { %>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        Publish
+                      <% } %>
+                    </button>
+                  </form>
+                  <form method="post" action="/admin/projects/<%= p._id %>/delete" onsubmit="return confirm('Permanently delete «<%= p.title %>»?');">
+                    <button type="submit" class="a-btn a-btn--danger a-btn--sm">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+                      Delete
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } %>
+
+    </div><!-- /admin-content -->
+  </div><!-- /admin-main -->
+</div><!-- /admin-app -->
+
+<script>
+  (function () {
+    var toggle = document.getElementById('sidebar-toggle');
+    var sidebar = document.getElementById('admin-sidebar');
+    if (toggle && sidebar) {
+      toggle.addEventListener('click', function () {
+        sidebar.classList.toggle('open');
+      });
+    }
+    /* Show hamburger only when sidebar is hidden */
+    function checkBreakpoint() {
+      if (toggle) toggle.style.display = window.innerWidth <= 820 ? '' : 'none';
+    }
+    checkBreakpoint();
+    window.addEventListener('resize', checkBreakpoint);
+  })();
+</script>
+</body>
+</html>

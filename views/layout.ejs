@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Qimora — Technology solutions company building AI-powered systems, enterprise software, and mobile applications." />
+  <meta name="theme-color" content="#0B0F1A" />
+  <title><%= title %></title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/images/icon.svg" />
+
+  <!-- Google Fonts — Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons (CDN) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+
+  <!-- Font Awesome — team social icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="dark" data-theme="dark">
+
+  <!-- Page Loader -->
+  <div id="page-loader" class="page-loader">
+    <div class="page-loader__content">
+      <div class="page-loader__icon">
+        <svg viewBox="0 0 108.43 108.59" xmlns="http://www.w3.org/2000/svg" class="loader-svg">
+          <g class="loader-arcs">
+            <path class="loader-icon-path" fill="#ffffff" d="M77.14,79.93c-13.87,11.77-34.63,10.66-46.97-2.2-11.97-12.48-12.62-32.5-1.19-45.95-4.75-4.75-9.5-9.5-14.31-14.28C.4,32.63-3.79,55.19,3.55,73.82c4.47,11.36,19.48,35.14,54.6,34.76,15.66-.17,31.31-.34,46.97-.51-9.33-9.38-18.65-18.77-27.98-28.15Z"/>
+            <path class="loader-icon-path" fill="#ffffff" d="M93.08,16C75.57-1.81,47.76-5.17,26.44,8.03c5.09,4.92,10.17,9.83,15.26,14.75,13.84-5.41,29.32-1.53,38.49,9.16,8.1,9.44,10.24,22.95,5.43,34.93,4.86,5.14,9.72,10.29,14.58,15.43,13.24-21.06,10.24-48.64-7.12-66.3Z"/>
+          </g>
+          <g class="loader-dot">
+            <circle fill="#ff8949" cx="54.37" cy="54.04" r="16.41"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <%- body %>
+
+  <!-- Main JS — animations, theme toggle, interactions -->
+  <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+  "name": "qimora",
+  "version": "1.0.0",
+  "description": "Qimora — Next-generation infrastructure platform. Built with Node.js, Express, EJS & MongoDB.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "seed": "node scripts/seed.js",
+    "google-auth": "node scripts/google-auth.js"
+  },
+  "keywords": [
+    "qimora",
+    "saas",
+    "landing-page",
+    "express",
+    "ejs",
+    "mongodb"
+  ],
+  "author": "Qimora Team",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.7.5",
+    "connect-mongo": "^6.0.0",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.19.0",
+    "googleapis": "^144.0.0",
+    "helmet": "^8.0.0",
+    "luxon": "^3.7.2",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "multer": "^2.1.1",
+    "nodemailer": "^6.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

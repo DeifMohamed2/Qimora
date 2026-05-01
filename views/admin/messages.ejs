@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/images/icon.svg" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body class="admin-body">
+<div class="admin-app">
+  <% var currentPage = 'messages'; %>
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <span>Messages</span>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <% if (flash && flash.msg) { %>
+        <div class="admin-flash admin-flash--<%= flash.type === 'err' ? 'err' : 'ok' %>"><%= flash.msg %></div>
+      <% } %>
+
+      <div class="admin-page-header">
+        <div>
+          <h1>Messages</h1>
+          <p>Contact form inquiries, grouped by <strong>received day</strong> (Cairo). Expand a card for the full message and actions.</p>
+        </div>
+      </div>
+
+      <form class="admin-hub-filters" method="get" action="/admin/messages" autocomplete="off">
+        <div class="admin-hub-filters__row">
+          <label class="admin-hub-filters__label">
+            <span>Search</span>
+            <input type="search" name="q" class="admin-hub-filters__input" placeholder="Name, email, subject, message…" value="<%= filters.q %>" />
+          </label>
+          <label class="admin-hub-filters__label">
+            <span>Read state</span>
+            <select name="read" class="admin-hub-filters__select">
+              <% [['all','All'],['unread','Unread'],['read','Read']].forEach(function(opt) { %>
+                <option value="<%= opt[0] %>" <%= filters.read === opt[0] ? 'selected' : '' %>><%= opt[1] %></option>
+              <% }); %>
+            </select>
+          </label>
+          <label class="admin-hub-filters__label">
+            <span>From</span>
+            <input type="date" name="from" class="admin-hub-filters__input" value="<%= filters.from %>" />
+          </label>
+          <label class="admin-hub-filters__label">
+            <span>To</span>
+            <input type="date" name="to" class="admin-hub-filters__input" value="<%= filters.to %>" />
+          </label>
+          <div class="admin-hub-filters__actions">
+            <button type="submit" class="a-btn a-btn--primary">Apply filters</button>
+            <a href="/admin/messages" class="a-btn a-btn--ghost">Clear all</a>
+          </div>
+        </div>
+      </form>
+
+      <% var fqe = typeof filterQueryEscaped !== 'undefined' ? filterQueryEscaped : ''; %>
+      <% var hasFilters = !!(filters.q || (filters.read && filters.read !== 'all') || filters.from || filters.to); %>
+
+      <% if (!messageDays || !messageDays.length) { %>
+        <div class="admin-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <h3><%= hasFilters ? 'No messages match these filters' : 'No messages yet' %></h3>
+          <p><%= hasFilters ? 'Adjust filters or clear them to see more.' : 'Submissions from Send Message on the site will show up here.' %></p>
+          <% if (hasFilters) { %><a href="/admin/messages" class="a-btn a-btn--primary">Reset filters</a><% } %>
+        </div>
+      <% } else { %>
+        <% messageDays.forEach(function(day) { %>
+          <section class="admin-day-section">
+            <header class="admin-day-section__head">
+              <h2 class="admin-day-section__title"><%= day.headline %></h2>
+              <span class="admin-day-section__badge"><%= day.contacts.length %> <%= day.contacts.length === 1 ? 'message' : 'messages' %></span>
+            </header>
+            <div class="admin-day-section__grid">
+              <% day.contacts.forEach(function(c) {
+                   var subj = c.subject === 'other' && c.customSubject ? c.customSubject : (c.subject || '—');
+              %>
+                <details class="admin-pro-card<%= c.read === true ? '' : ' admin-pro-card--unread' %>">
+                  <summary class="admin-pro-card__summary">
+                    <span class="admin-pro-card__summary-main">
+                      <strong class="admin-pro-card__name"><%= c.name %></strong>
+                      <span class="admin-pro-card__email">&lt;<%= c.email %>&gt;</span>
+                    </span>
+                    <span class="admin-pro-card__summary-meta">
+                      <% if (c.read !== true) { %><span class="admin-badge admin-badge--draft">Unread</span><% } %>
+                      <span class="admin-pro-card__time"><%= c.createdAt ? new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '' %></span>
+                      <span class="admin-pro-card__chev" aria-hidden="true"></span>
+                    </span>
+                  </summary>
+                  <div class="admin-pro-card__body">
+                    <div class="admin-pro-card__tags">
+                      <span class="admin-inbox-tag"><%= subj %></span>
+                      <% if (c.company) { %><span class="admin-inbox-muted"><%= c.company %></span><% } %>
+                      <% if (c.whatsappPhone) { %><span class="admin-inbox-muted">WhatsApp <%= c.whatsappPhone %></span><% } %>
+                    </div>
+                    <p class="admin-pro-card__agenda"><%= c.message %></p>
+                    <p class="admin-pro-card__metafoot">Received <%= c.createdAt ? new Date(c.createdAt).toLocaleString() : '—' %> · ID <%= c._id %></p>
+                    <div class="admin-pro-card__actions">
+                      <% if (c.read !== true) { %>
+                        <form method="post" action="/admin/messages/<%= c._id %>/read" class="admin-pro-card__form">
+                          <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+                          <button type="submit" class="a-btn a-btn--secondary a-btn--sm">Mark read</button>
+                        </form>
+                      <% } %>
+                      <form method="post" action="/admin/messages/<%= c._id %>/delete" class="admin-pro-card__form" onsubmit="return confirm('Delete this message permanently?');">
+                        <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+                        <button type="submit" class="a-btn a-btn--danger a-btn--sm">Delete</button>
+                      </form>
+                    </div>
+                  </div>
+                </details>
+              <% }); %>
+            </div>
+          </section>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+  (function () {
+    var toggle = document.getElementById('sidebar-toggle');
+    var sidebar = document.getElementById('admin-sidebar');
+    if (toggle && sidebar) {
+      toggle.addEventListener('click', function () { sidebar.classList.toggle('open'); });
+    }
+    function checkBreakpoint() {
+      if (toggle) toggle.style.display = window.innerWidth <= 820 ? '' : 'none';
+    }
+    checkBreakpoint();
+    window.addEventListener('resize', checkBreakpoint);
+  })();
+</script>
+</body>
+</html>

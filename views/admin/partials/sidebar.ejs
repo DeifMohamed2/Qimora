@@ -1,0 +1,107 @@
+<%
+  /* currentPage is set by each view: 'projects', 'messages', 'meetings' etc. */
+  var cp = typeof currentPage !== 'undefined' ? currentPage : '';
+  var ae = typeof adminEmail !== 'undefined' ? adminEmail : '';
+  var initials = ae ? ae.charAt(0).toUpperCase() : 'A';
+  var pillCount = 0;
+  if (typeof projectCount === 'number' && !Number.isNaN(projectCount)) {
+    pillCount = projectCount;
+  } else if (typeof projects !== 'undefined' && Array.isArray(projects)) {
+    pillCount = projects.length;
+  }
+  var msgUnread = typeof unreadMessageCount === 'number' ? unreadMessageCount : 0;
+  var mtUp = typeof upcomingMeetingCount === 'number' ? upcomingMeetingCount : 0;
+%>
+<aside class="admin-sidebar" id="admin-sidebar" aria-label="Admin navigation">
+
+  <!-- Brand -->
+  <a href="/admin" class="admin-sidebar__brand">
+    <img src="/images/qimora.png" alt="Qimora" class="admin-sidebar__logo" />
+    <span class="admin-sidebar__badge">Admin</span>
+  </a>
+
+  <!-- MAIN section -->
+  <div class="admin-nav-section">
+    <span class="admin-nav-section__label">Main</span>
+
+    <a href="/admin" class="admin-nav-item <%= cp === 'projects' ? 'active' : '' %>">
+      <svg class="admin-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="3" width="7" height="9" rx="1"/><rect x="15" y="3" width="7" height="5" rx="1"/><rect x="15" y="12" width="7" height="9" rx="1"/><rect x="2" y="16" width="7" height="5" rx="1"/>
+      </svg>
+      <span class="admin-nav-item__label">Projects</span>
+      <span class="admin-nav-item__pill" aria-label="<%= pillCount %> projects"><%= pillCount %></span>
+    </a>
+  </div>
+
+  <!-- COMMUNICATION section -->
+  <div class="admin-nav-section">
+    <span class="admin-nav-section__label">Communication</span>
+
+    <a href="/admin/messages" class="admin-nav-item <%= cp === 'messages' ? 'active' : '' %>">
+      <svg class="admin-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+      </svg>
+      <span class="admin-nav-item__label">Messages</span>
+      <span class="admin-nav-item__pill" aria-label="<%= msgUnread %> unread"><%= msgUnread %></span>
+    </a>
+
+    <a href="/admin/meetings" class="admin-nav-item <%= cp === 'meetings' ? 'active' : '' %>">
+      <svg class="admin-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span class="admin-nav-item__label">Meetings</span>
+      <span class="admin-nav-item__pill" aria-label="<%= mtUp %> upcoming"><%= mtUp %></span>
+    </a>
+  </div>
+
+  <!-- SITE CONTENT section -->
+  <div class="admin-nav-section">
+    <span class="admin-nav-section__label">Site content</span>
+
+    <span class="admin-nav-item disabled">
+      <svg class="admin-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+      Team
+      <span class="admin-nav-item__soon">Soon</span>
+    </span>
+
+    <span class="admin-nav-item disabled">
+      <svg class="admin-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+      </svg>
+      Blog / News
+      <span class="admin-nav-item__soon">Soon</span>
+    </span>
+  </div>
+
+  <div class="admin-sidebar__divider"></div>
+
+  <!-- SYSTEM section -->
+  <div class="admin-nav-section">
+    <span class="admin-nav-section__label">System</span>
+
+    <a href="/" target="_blank" rel="noopener" class="admin-nav-item">
+      <svg class="admin-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+      </svg>
+      View site
+    </a>
+  </div>
+
+  <!-- User footer -->
+  <div class="admin-sidebar__user">
+    <div class="admin-sidebar__avatar"><%= initials %></div>
+    <div class="admin-sidebar__user-info">
+      <div class="admin-sidebar__user-name"><%= ae || 'Admin' %></div>
+      <div class="admin-sidebar__user-role">Super Admin</div>
+    </div>
+    <form method="post" action="/admin/logout" style="margin:0;flex-shrink:0;">
+      <button type="submit" title="Log out" style="background:none;border:none;cursor:pointer;color:var(--a-muted);padding:4px;" aria-label="Log out">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+</aside>

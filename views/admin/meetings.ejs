@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/images/icon.svg" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body class="admin-body">
+<div class="admin-app">
+  <% var currentPage = 'meetings'; %>
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <span>Meetings</span>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <% if (flash && flash.msg) { %>
+        <div class="admin-flash admin-flash--<%= flash.type === 'err' ? 'err' : 'ok' %>"><%= flash.msg %></div>
+      <% } %>
+
+      <div class="admin-page-header">
+        <div>
+          <h1>Meetings</h1>
+          <p>Grouped by Cairo day. Use <strong>Details</strong> on each row for full info and actions. Checkboxes are only for bulk actions.</p>
+        </div>
+      </div>
+
+      <form class="admin-hub-filters" method="get" action="/admin/meetings" autocomplete="off">
+        <div class="admin-hub-filters__row">
+          <label class="admin-hub-filters__label">
+            <span>Search</span>
+            <input type="search" name="q" class="admin-hub-filters__input" placeholder="Name, email, agenda…" value="<%= filters.q %>" />
+          </label>
+          <label class="admin-hub-filters__label">
+            <span>Status</span>
+            <select name="status" class="admin-hub-filters__select">
+              <% [['all','All'],['upcoming','Upcoming'],['past','Past'],['pending','Pending'],['confirmed','Confirmed'],['completed','Ended'],['cancelled','Cancelled']].forEach(function(opt) { %>
+                <option value="<%= opt[0] %>" <%= filters.status === opt[0] ? 'selected' : '' %>><%= opt[1] %></option>
+              <% }); %>
+            </select>
+          </label>
+          <label class="admin-hub-filters__label">
+            <span>From</span>
+            <input type="date" name="from" class="admin-hub-filters__input" value="<%= filters.from %>" />
+          </label>
+          <label class="admin-hub-filters__label">
+            <span>To</span>
+            <input type="date" name="to" class="admin-hub-filters__input" value="<%= filters.to %>" />
+          </label>
+          <div class="admin-hub-filters__actions">
+            <button type="submit" class="a-btn a-btn--primary">Apply filters</button>
+            <a href="/admin/meetings" class="a-btn a-btn--ghost">Clear all</a>
+          </div>
+        </div>
+      </form>
+
+      <% var fqe = typeof filterQueryEscaped !== 'undefined' ? filterQueryEscaped : ''; %>
+      <% var hasFilters = !!(filters.q || (filters.status && filters.status !== 'all') || filters.from || filters.to); %>
+
+      <% if (!meetingDays || !meetingDays.length) { %>
+        <div class="admin-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <h3><%= hasFilters ? 'No meetings match these filters' : 'No meetings booked' %></h3>
+          <p><%= hasFilters ? 'Try clearing filters or broadening the date range.' : 'New bookings from the site will appear here by day.' %></p>
+          <% if (hasFilters) { %><a href="/admin/meetings" class="a-btn a-btn--primary">Reset filters</a><% } %>
+        </div>
+      <% } else { %>
+
+        <%/* ── Bulk action bar ──────────────────────────────────────── */%>
+        <div class="admin-meetings-bulk">
+          <div class="admin-meetings-bulk__inner">
+            <label class="admin-meetings-bulk__select-all">
+              <input type="checkbox" id="meetings-select-all" />
+              <span>Select all</span>
+            </label>
+            <span class="admin-meetings-bulk__count" id="meetings-bulk-count">0 selected</span>
+            <form id="meetings-bulk-form" method="post" action="/admin/meetings/bulk" class="admin-meetings-bulk__actions">
+              <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+              <button type="submit" name="bulkAction" value="confirm" class="a-btn a-btn--secondary a-btn--sm">Confirm selected</button>
+              <button type="submit" name="bulkAction" value="cancel"  class="a-btn a-btn--ghost a-btn--sm">Cancel selected</button>
+              <button type="submit" name="bulkAction" value="delete"  class="a-btn a-btn--danger a-btn--sm">Delete selected</button>
+            </form>
+          </div>
+        </div>
+
+        <%/* ── Day sections ─────────────────────────────────────────── */%>
+        <% meetingDays.forEach(function(day) { %>
+          <section class="admin-day-section">
+            <header class="admin-day-section__head">
+              <h2 class="admin-day-section__title"><%= day.headline %></h2>
+              <span class="admin-day-section__badge"><%= day.meetings.length %> <%= day.meetings.length === 1 ? 'meeting' : 'meetings' %></span>
+            </header>
+            <div class="meet-day-list">
+              <% day.meetings.forEach(function(m) {
+                   var st = m.status || 'pending';
+                   var stLabel = { pending: 'Pending', confirmed: 'Confirmed', completed: 'Ended', cancelled: 'Cancelled' }[st] || st;
+                   var badgeClass = st === 'confirmed' ? 'admin-badge admin-badge--live'
+                     : st === 'completed'  ? 'admin-badge admin-badge--blue'
+                     : st === 'cancelled'  ? 'admin-badge admin-badge--danger'
+                     : 'admin-badge admin-badge--draft';
+                   var stripClass = st === 'confirmed' ? 'meet-slot--strip-confirmed'
+                     : st === 'completed'  ? 'meet-slot--strip-completed'
+                     : st === 'cancelled'  ? 'meet-slot--strip-cancelled'
+                     : 'meet-slot--strip-pending';
+              %>
+                <article class="meet-slot <%= stripClass %>">
+                  <div class="meet-slot__bar">
+                    <label class="meet-slot__pick">
+                      <input type="checkbox"
+                             name="ids"
+                             value="<%= m._id %>"
+                             class="js-meeting-bulk-cb meet-slot__cb"
+                             form="meetings-bulk-form"
+                             aria-label="Select <%= m.name %> for bulk action" />
+                    </label>
+                    <div class="meet-slot__summary">
+                      <div class="meet-slot__who">
+                        <span class="meet-slot__name"><%= m.name %></span>
+                        <span class="meet-slot__email">&lt;<%= m.email %>&gt;</span>
+                      </div>
+                      <div class="meet-slot__meta">
+                        <span class="<%= badgeClass %>"><%= stLabel %></span>
+                        <span class="meet-slot__time"><%= m.labelCairo %></span>
+                      </div>
+                    </div>
+                    <button type="button" class="meet-slot__details-btn js-meet-details" aria-expanded="false">
+                      <span class="meet-slot__details-label">Details</span>
+                      <svg class="meet-slot__chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                  </div>
+
+                  <div class="meet-slot__panel">
+                    <div class="admin-pro-meet-grid">
+                      <div>
+                        <div class="admin-inbox-muted admin-inbox-label">Guest timezone</div>
+                        <div><%= (m.viewerTimeZone || '').replace(/_/g, ' ') %> — <strong><%= m.labelViewer %></strong></div>
+                      </div>
+                      <div>
+                        <div class="admin-inbox-muted admin-inbox-label">Cairo</div>
+                        <div><strong><%= m.labelCairo %></strong></div>
+                      </div>
+                    </div>
+                    <% if (m.company) { %><p class="admin-pro-card__line"><span class="admin-inbox-muted">Company</span> <%= m.company %></p><% } %>
+                    <% if (m.whatsappPhone) { %><p class="admin-pro-card__line"><span class="admin-inbox-muted">WhatsApp</span> <%= m.whatsappPhone %></p><% } %>
+                    <% if (m.meetLink) { %><p class="admin-pro-card__line"><span class="admin-inbox-muted">Google Meet</span> <a href="<%= m.meetLink %>" target="_blank" rel="noopener noreferrer"><%= m.meetLink %></a></p><% } %>
+                    <p class="admin-pro-card__agenda"><%= m.agenda %></p>
+                    <p class="admin-pro-card__metafoot">Booked <%= m.createdAt ? new Date(m.createdAt).toLocaleString() : '—' %> · ID <%= m._id %></p>
+
+                    <div class="admin-pro-card__actions admin-pro-card__actions--meetings">
+                      <% if (m.status === 'pending') { %>
+                        <form method="post" action="/admin/meetings/<%= m._id %>/confirm" class="admin-pro-card__form"
+                              onsubmit="return confirm('Confirm this meeting? We will create the calendar event (if configured) and email the guest.');">
+                          <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+                          <button type="submit" class="a-btn a-btn--secondary a-btn--sm">Confirm &amp; notify guest</button>
+                        </form>
+                      <% } %>
+                      <% if (m.status === 'confirmed') { %>
+                        <form method="post" action="/admin/meetings/<%= m._id %>/complete" class="admin-pro-card__form"
+                              onsubmit="return confirm('Mark this meeting as ended?');">
+                          <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+                          <button type="submit" class="a-btn a-btn--primary a-btn--sm">Mark ended</button>
+                        </form>
+                        <% if (!m.isPast) { %>
+                          <span class="admin-pro-card__action-hint">Optional before slot end</span>
+                        <% } %>
+                      <% } %>
+                      <% if (m.status === 'pending' || m.status === 'confirmed') { %>
+                        <form method="post" action="/admin/meetings/<%= m._id %>/cancel" class="admin-pro-card__form"
+                              onsubmit="return confirm('Cancel this meeting? The calendar event will be removed (if any) and the slot opens for new bookings.');">
+                          <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+                          <button type="submit" class="a-btn a-btn--ghost a-btn--sm">Cancel meeting</button>
+                        </form>
+                      <% } %>
+                      <form method="post" action="/admin/meetings/<%= m._id %>/delete" class="admin-pro-card__form"
+                            onsubmit="return confirm('Permanently delete this record? This cannot be undone.');">
+                        <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+                        <button type="submit" class="a-btn a-btn--danger a-btn--sm">Delete record</button>
+                      </form>
+                    </div>
+                  </div>
+
+                </article>
+              <% }); %>
+            </div>
+          </section>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  /* ── Sidebar toggle ─────────────────────────────────────── */
+  var sidebarToggle = document.getElementById('sidebar-toggle');
+  var sidebar       = document.getElementById('admin-sidebar');
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', function () { sidebar.classList.toggle('open'); });
+  }
+  function checkBp() {
+    if (sidebarToggle) sidebarToggle.style.display = window.innerWidth <= 820 ? '' : 'none';
+  }
+  checkBp();
+  window.addEventListener('resize', checkBp);
+
+  /* ── Meeting row: only the Details button toggles the panel ───────── */
+  document.querySelectorAll('.js-meet-details').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var slot = btn.closest('.meet-slot');
+      if (!slot) return;
+      var open = slot.classList.toggle('meet-slot--open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var lbl = btn.querySelector('.meet-slot__details-label');
+      if (lbl) lbl.textContent = open ? 'Hide' : 'Details';
+    });
+  });
+
+  /* ── Bulk selection ─────────────────────────────────────── */
+  var bulkForm  = document.getElementById('meetings-bulk-form');
+  var countEl   = document.getElementById('meetings-bulk-count');
+  var selectAll = document.getElementById('meetings-select-all');
+
+  function allCbs() { return Array.from(document.querySelectorAll('.js-meeting-bulk-cb')); }
+
+  function updateBulkUi() {
+    var cbs = allCbs();
+    var n   = cbs.filter(function (c) { return c.checked; }).length;
+    if (countEl) countEl.textContent = n === 1 ? '1 selected' : n + ' selected';
+    if (selectAll && cbs.length) {
+      selectAll.checked       = n === cbs.length;
+      selectAll.indeterminate = n > 0 && n < cbs.length;
+    }
+  }
+
+  document.addEventListener('change', function (e) {
+    if (e.target.classList.contains('js-meeting-bulk-cb')) updateBulkUi();
+  });
+
+  if (selectAll) {
+    selectAll.addEventListener('change', function () {
+      var on = selectAll.checked;
+      allCbs().forEach(function (cb) { cb.checked = on; });
+      updateBulkUi();
+    });
+  }
+
+  if (bulkForm) {
+    bulkForm.addEventListener('submit', function (e) {
+      var sub = e.submitter;
+      if (!sub || sub.getAttribute('name') !== 'bulkAction') return;
+      var n = allCbs().filter(function (c) { return c.checked; }).length;
+      if (!n) { e.preventDefault(); return; }
+      var msgs = {
+        confirm: 'Confirm ' + n + ' meeting(s)? Calendar + email run for each pending row; others are skipped.',
+        cancel:  'Cancel '  + n + ' meeting(s)? Calendar events are removed; booking slots reopen.',
+        delete:  'Permanently delete ' + n + ' meeting record(s)? This cannot be undone.'
+      };
+      if (msgs[sub.value] && !confirm(msgs[sub.value])) e.preventDefault();
+    });
+  }
+
+  updateBulkUi();
+}());
+</script>
+</body>
+</html>

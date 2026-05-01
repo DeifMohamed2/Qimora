@@ -1,0 +1,79 @@
+<!-- ============================================================
+     NAVBAR — Premium glassmorphism navigation
+     ============================================================ -->
+<nav id="navbar" class="navbar">
+  <div class="navbar__container">
+    <div class="navbar__inner">
+
+      <!-- Brand icon -->
+      <a href="/" class="navbar__logo" id="navbar-logo">
+        <img src="/images/icon.svg" alt="Qimora" class="navbar__logo-img" width="108" height="109" />
+      </a>
+
+      <!-- Desktop Nav — Floating pill -->
+      <div class="navbar__center-pill">
+        <button class="navbar__link" data-scroll="product">
+          <i data-lucide="home" class="navbar__link-icon"></i>
+          Home
+        </button>
+        <button class="navbar__link" data-scroll="features">
+          <i data-lucide="briefcase" class="navbar__link-icon"></i>
+          Services
+        </button>
+        <button class="navbar__link" data-scroll="portfolio">
+          <i data-lucide="folder" class="navbar__link-icon"></i>
+          Portfolio
+        </button>
+        <button class="navbar__link" data-scroll="team">
+          <i data-lucide="users" class="navbar__link-icon"></i>
+          Team
+        </button>
+        <button class="navbar__link" data-scroll="contact">
+          <i data-lucide="mail" class="navbar__link-icon"></i>
+          Contact
+        </button>
+        <!-- Active indicator bar (moves with JS) -->
+        <span class="navbar__link-indicator" id="nav-indicator"></span>
+      </div>
+
+      <!-- Right side -->
+      <div class="navbar__actions">
+        <button id="theme-toggle" class="navbar__theme-btn" aria-label="Toggle theme">
+          <i data-lucide="sun" class="navbar__icon navbar__icon--sun"></i>
+          <i data-lucide="moon" class="navbar__icon navbar__icon--moon"></i>
+        </button>
+
+        <button id="mobile-toggle" class="navbar__mobile-btn" aria-label="Menu">
+          <i data-lucide="menu" class="navbar__icon navbar__icon--menu"></i>
+          <i data-lucide="x" class="navbar__icon navbar__icon--close"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu — Fullscreen overlay -->
+  <div id="mobile-menu" class="navbar__mobile-menu">
+    <div class="navbar__mobile-inner">
+      <button class="navbar__mobile-link" data-scroll="product">
+        <i data-lucide="home"></i>
+        <span>Home</span>
+      </button>
+      <button class="navbar__mobile-link" data-scroll="features">
+        <i data-lucide="briefcase"></i>
+        <span>Services</span>
+      </button>
+      <button class="navbar__mobile-link" data-scroll="portfolio">
+        <i data-lucide="folder"></i>
+        <span>Portfolio</span>
+      </button>
+      <button class="navbar__mobile-link" data-scroll="team">
+        <i data-lucide="users"></i>
+        <span>Team</span>
+      </button>
+      <button class="navbar__mobile-link" data-scroll="contact">
+        <i data-lucide="mail"></i>
+        <span>Contact</span>
+      </button>
+    </div>
+  </div>
+</nav>

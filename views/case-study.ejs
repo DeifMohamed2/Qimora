@@ -1,0 +1,733 @@
+<%- include('partials/navbar-cs') %>
+
+<!-- ============================================================
+     CASE STUDY — Full Professional Rebuild
+     ============================================================ -->
+
+<!-- ─── HERO ─────────────────────────────────────────────────── -->
+<section id="cs-top" class="cs-hero cs-hero--page-enter" style="--ac: <%= project.color %>;">
+  <div class="cs-hero__noise"></div>
+  <div class="cs-hero__grid"></div>
+  <div class="cs-hero__glow-top"></div>
+
+  <div class="cs-hero__inner">
+
+    <!-- Breadcrumb -->
+    <nav class="cs-breadcrumb">
+      <a href="/" class="cs-breadcrumb__link">Home</a>
+      <i data-lucide="chevron-right" class="cs-breadcrumb__sep"></i>
+      <a href="/#portfolio" class="cs-breadcrumb__link">Work</a>
+      <i data-lucide="chevron-right" class="cs-breadcrumb__sep"></i>
+      <span class="cs-breadcrumb__current"><%= project.title %></span>
+    </nav>
+
+    <div class="cs-hero__layout">
+      <!-- Left: Content -->
+      <div class="cs-hero__content">
+        <h1 class="cs-hero__title"><%= project.title %></h1>
+        <p class="cs-hero__desc"><%= project.description %></p>
+
+        <div class="cs-hero__pills">
+          <div class="cs-pill">
+            <div class="cs-pill__icon"><i data-lucide="building-2"></i></div>
+            <div>
+              <div class="cs-pill__label">Industry</div>
+              <div class="cs-pill__val"><%= project.industry %></div>
+            </div>
+          </div>
+          <div class="cs-pill">
+            <div class="cs-pill__icon"><i data-lucide="calendar"></i></div>
+            <div>
+              <div class="cs-pill__label">Duration</div>
+              <div class="cs-pill__val"><%= project.duration %></div>
+            </div>
+          </div>
+          <div class="cs-pill">
+            <div class="cs-pill__icon"><i data-lucide="users"></i></div>
+            <div>
+              <div class="cs-pill__label">Team</div>
+              <div class="cs-pill__val"><%= project.teamSize %></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile app announcement + store badges (not under the slider) -->
+        <% if (project.mobileScreenshots && project.mobileScreenshots.length > 0) { %>
+        <% var heroLiveSite = project.websiteUrl && project.websiteUrl !== '#' ? project.websiteUrl : ''; %>
+        <div class="cs-app-notice" style="--ac: <%= project.color %>;">
+          <div class="cs-app-notice__row">
+            <div class="cs-app-notice__dot"></div>
+            <i data-lucide="smartphone"></i>
+            <span>This project includes a <strong>mobile app</strong> — switch to the Mobile App tab on the right</span>
+          </div>
+          <% if (project.appStoreUrl || project.playStoreUrl || heroLiveSite) { %>
+          <div class="cs-app-notice__stores cs-store-badges">
+            <% if (project.appStoreUrl) { %>
+            <a href="<%= project.appStoreUrl %>" class="cs-store-badge cs-store-badge--apple" target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
+              <svg class="cs-store-badge__icon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              <span class="cs-store-badge__text">
+                <span class="cs-store-badge__sub">Download on the</span>
+                <span class="cs-store-badge__name">App Store</span>
+              </span>
+            </a>
+            <% } %>
+            <% if (project.playStoreUrl) { %>
+            <a href="<%= project.playStoreUrl %>" class="cs-store-badge cs-store-badge--google" target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+              <svg class="cs-store-badge__icon" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.18 23.76c.35.2.76.22 1.15.07l12.44-7.19-2.65-2.65-10.94 9.77z" fill="#EA4335"/><path d="M22.34 10.33a2.06 2.06 0 000-3.66l-2.63-1.52-2.94 2.94 2.94 2.94 2.63-1.7z" fill="#FBBC04"/><path d="M2.04 1.37A2 2 0 001 3.24v17.52c0 .77.43 1.46 1.04 1.87l.14.08 9.82-9.83v-.22L2.04 1.37z" fill="#4285F4"/><path d="M16.41 8.1L12 3.68 2.04 1.37l10.94 9.78 3.43-3.05z" fill="#34A853"/></svg>
+              <span class="cs-store-badge__text">
+                <span class="cs-store-badge__sub">Get it on</span>
+                <span class="cs-store-badge__name">Google Play</span>
+              </span>
+            </a>
+            <% } %>
+            <% if (heroLiveSite) { %>
+            <a href="<%= heroLiveSite %>" class="cs-store-badge cs-store-badge--web" target="_blank" rel="noopener noreferrer" aria-label="Open live website in a new tab">
+              <i data-lucide="globe" class="cs-store-badge__icon" aria-hidden="true"></i>
+              <span class="cs-store-badge__text">
+                <span class="cs-store-badge__sub">Open the</span>
+                <span class="cs-store-badge__name">Live website</span>
+              </span>
+            </a>
+            <% } %>
+          </div>
+          <% } %>
+        </div>
+        <% } %>
+
+        <!-- Action buttons -->
+        <div class="cs-hero__actions">
+          <% var hasMobileHero = project.mobileScreenshots && project.mobileScreenshots.length > 0; %>
+          <% if (!hasMobileHero && (project.appStoreUrl || project.playStoreUrl)) { %>
+            <% if (project.appStoreUrl) { %>
+            <a href="<%= project.appStoreUrl %>" class="cs-btn cs-btn--outline" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              App Store
+            </a>
+            <% } %>
+            <% if (project.playStoreUrl) { %>
+            <a href="<%= project.playStoreUrl %>" class="cs-btn cs-btn--outline" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24"><path d="M3.18 23.76c.35.2.76.22 1.15.07l12.44-7.19-2.65-2.65-10.94 9.77z" fill="#EA4335"/><path d="M22.34 10.33a2.06 2.06 0 000-3.66l-2.63-1.52-2.94 2.94 2.94 2.94 2.63-1.7z" fill="#FBBC04"/><path d="M2.04 1.37A2 2 0 001 3.24v17.52c0 .77.43 1.46 1.04 1.87l.14.08 9.82-9.83v-.22L2.04 1.37z" fill="#4285F4"/><path d="M16.41 8.1L12 3.68 2.04 1.37l10.94 9.78 3.43-3.05z" fill="#34A853"/></svg>
+              Google Play
+            </a>
+            <% } %>
+          <% } %>
+          <a href="/#contact" class="cs-btn cs-btn--hero-start">
+            <i data-lucide="mail"></i>
+            Start a Project
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Dual Viewer -->
+      <div class="cs-hero__visual">
+        <div class="cs-dualviewer" style="--ac: <%= project.color %>;">
+          <% var hasMobile = project.mobileScreenshots && project.mobileScreenshots.length > 0; %>
+
+          <!-- Tab switcher -->
+          <% if (hasMobile) { %>
+          <div class="cs-dv-tabs">
+            <button class="cs-dv-tab cs-dv-tab--active" id="tabWeb" onclick="switchViewer('web')">
+              <i data-lucide="monitor"></i>
+              <span>Website</span>
+            </button>
+            <button class="cs-dv-tab" id="tabMobile" onclick="switchViewer('mobile')">
+              <i data-lucide="smartphone"></i>
+              <span>Mobile App</span>
+            </button>
+          </div>
+          <% } %>
+
+          <!-- ── PANEL: WEB ── -->
+          <div class="cs-dv-panel" id="panelWeb">
+            <div class="cs-browser-frame">
+              <div class="cs-browser-bar">
+                <div class="cs-browser-dots">
+                  <span class="cs-browser-dot cs-browser-dot--r"></span>
+                  <span class="cs-browser-dot cs-browser-dot--y"></span>
+                  <span class="cs-browser-dot cs-browser-dot--g"></span>
+                </div>
+                <div class="cs-browser-url">
+                  <i data-lucide="lock"></i>
+                  <span>qimora.app/<%= project.id %></span>
+                </div>
+                <div class="cs-browser-badge">
+                  <i data-lucide="<%= project.icon || 'layers' %>"></i>
+                </div>
+              </div>
+              <div class="cs-browser-viewport">
+                <% var allWebImages = [project.image].concat(project.extraImages || []); %>
+                <% allWebImages.forEach(function(img, i) { %>
+                  <div class="cs-slide cs-slide--web <%= i === 0 ? 'cs-slide--active' : '' %>" data-wi="<%= i %>">
+                    <img src="<%= img %>" alt="<%= project.title %> screen <%= i + 1 %>" loading="<%= i === 0 ? 'eager' : 'lazy' %>">
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+            <!-- Nav below browser -->
+            <div class="cs-dv-nav" id="webNav">
+              <button class="cs-dv-arrow" onclick="webNav(-1)" aria-label="Previous">
+                <i data-lucide="arrow-left"></i>
+              </button>
+              <div class="cs-dv-dots" id="webDots">
+                <% allWebImages.forEach(function(img, i) { %>
+                  <button class="cs-dv-dot <%= i === 0 ? 'cs-dv-dot--on' : '' %>" onclick="goToWeb(<%= i %>)" aria-label="Slide <%= i + 1 %>"></button>
+                <% }); %>
+              </div>
+              <button class="cs-dv-arrow" onclick="webNav(1)" aria-label="Next">
+                <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── PANEL: MOBILE ── -->
+          <% if (hasMobile) { %>
+          <div class="cs-dv-panel cs-dv-panel--hidden" id="panelMobile">
+            <!-- Phone mockup -->
+            <div class="cs-phone-wrap">
+              <div class="cs-phone2">
+                <div class="cs-phone2__chassis">
+                  <div class="cs-phone2__btns-l"></div>
+                  <div class="cs-phone2__btn-r"></div>
+                  <div class="cs-phone2__face">
+                    <div class="cs-phone2__notch">
+                      <div class="cs-phone2__speaker"></div>
+                      <div class="cs-phone2__cam"></div>
+                    </div>
+                    <div class="cs-phone2__display">
+                      <% project.mobileScreenshots.forEach(function(shot, i) { %>
+                        <div class="cs-slide cs-slide--mob <%= i === 0 ? 'cs-slide--active' : '' %>" data-mi="<%= i %>">
+                          <img src="<%= shot.url %>" alt="<%= shot.caption || 'Screen ' + (i+1) %>" loading="<%= i === 0 ? 'eager' : 'lazy' %>">
+                        </div>
+                      <% }); %>
+                    </div>
+                    <div class="cs-phone2__home"></div>
+                  </div>
+                </div>
+                <div class="cs-phone2__shadow"></div>
+              </div>
+            </div>
+
+            <!-- Nav below phone -->
+            <div class="cs-dv-nav" id="mobileNav">
+              <button class="cs-dv-arrow" onclick="mobileNav(-1)" aria-label="Previous screen">
+                <i data-lucide="arrow-left"></i>
+              </button>
+              <div class="cs-dv-dots" id="mobileDots">
+                <% project.mobileScreenshots.forEach(function(shot, i) { %>
+                  <button class="cs-dv-dot <%= i === 0 ? 'cs-dv-dot--on' : '' %>" onclick="goToMobile(<%= i %>)" aria-label="Screen <%= i + 1 %>"></button>
+                <% }); %>
+              </div>
+              <button class="cs-dv-arrow" onclick="mobileNav(1)" aria-label="Next screen">
+                <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+
+            <!-- Caption -->
+            <div class="cs-dv-caption">
+              <span class="cs-dv-caption__count"><span id="mobCur">1</span> / <%= project.mobileScreenshots.length %></span>
+              <span class="cs-dv-caption__sep">·</span>
+              <span class="cs-dv-caption__text" id="mobCaption"><%= project.mobileScreenshots[0] && project.mobileScreenshots[0].caption ? project.mobileScreenshots[0].caption : '' %></span>
+            </div>
+          </div>
+          <% } %>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ─── STATS MARQUEE BAR ──────────────────────────────────────── -->
+<div class="cs-statsbar" style="--ac: <%= project.color %>;">
+  <div class="cs-statsbar__inner">
+    <% project.stats.forEach(function(stat, i) { %>
+      <div class="cs-statsbar__item">
+        <span class="cs-statsbar__val"><%= stat.value %></span>
+        <span class="cs-statsbar__lbl"><%= stat.label %></span>
+      </div>
+      <% if (i < project.stats.length - 1) { %>
+        <div class="cs-statsbar__sep"></div>
+      <% } %>
+    <% }); %>
+  </div>
+</div>
+
+
+<!-- ─── SECTION 01: OVERVIEW ──────────────────────────────────── -->
+<section id="cs-overview" class="cs-section cs-section--light">
+  <div class="cs-section__inner">
+
+    <div class="cs-overview">
+      <div class="cs-overview__main">
+        <div class="cs-section-label" style="color: var(--ac);">
+          <span class="cs-section-label__num">01</span>
+          <span class="cs-section-label__line"></span>
+          <span>Project Overview</span>
+        </div>
+        <h2 class="cs-section-title">What We Built &amp; Why</h2>
+        <p class="cs-section-body"><%= project.overview %></p>
+
+        <!-- Challenge Block -->
+        <div class="cs-challenge" style="--ac: <%= project.color %>;">
+          <div class="cs-challenge__header">
+            <div class="cs-challenge__icon">
+              <i data-lucide="zap"></i>
+            </div>
+            <h3 class="cs-challenge__title">The Challenge</h3>
+          </div>
+          <p class="cs-challenge__body"><%= project.challenge %></p>
+        </div>
+
+        <% if (project.techRationale && String(project.techRationale).trim()) { %>
+        <div class="cs-challenge" style="--ac: <%= project.color %>; margin-top: 1.5rem;">
+          <div class="cs-challenge__header">
+            <div class="cs-challenge__icon">
+              <i data-lucide="cpu"></i>
+            </div>
+            <h3 class="cs-challenge__title">Tech Stack &amp; Selection</h3>
+          </div>
+          <p class="cs-challenge__body"><%= project.techRationale %></p>
+        </div>
+        <% } %>
+      </div>
+
+      <div class="cs-overview__aside">
+        <!-- Project Details Card -->
+        <div class="cs-detail-card" style="--ac: <%= project.color %>;">
+          <div class="cs-detail-card__head">
+            <i data-lucide="clipboard-list"></i>
+            Project Details
+          </div>
+          <div class="cs-detail-card__rows">
+            <div class="cs-detail-row">
+              <div class="cs-detail-row__icon"><i data-lucide="building-2"></i></div>
+              <div>
+                <div class="cs-detail-row__lbl">Client Industry</div>
+                <div class="cs-detail-row__val"><%= project.industry %></div>
+              </div>
+            </div>
+            <div class="cs-detail-row">
+              <div class="cs-detail-row__icon"><i data-lucide="calendar"></i></div>
+              <div>
+                <div class="cs-detail-row__lbl">Project Duration</div>
+                <div class="cs-detail-row__val"><%= project.duration %></div>
+              </div>
+            </div>
+            <div class="cs-detail-row">
+              <div class="cs-detail-row__icon"><i data-lucide="users"></i></div>
+              <div>
+                <div class="cs-detail-row__lbl">Team Size</div>
+                <div class="cs-detail-row__val"><%= project.teamSize %></div>
+              </div>
+            </div>
+            <div class="cs-detail-row">
+              <div class="cs-detail-row__icon"><i data-lucide="monitor-smartphone"></i></div>
+              <div>
+                <div class="cs-detail-row__lbl">Platforms</div>
+                <div class="cs-detail-row__val"><%= project.platforms %></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tech Stack Card -->
+        <div class="cs-tech-card" style="--ac: <%= project.color %>;">
+          <div class="cs-tech-card__head">
+            <i data-lucide="code-2"></i>
+            Tech Stack
+          </div>
+          <div class="cs-tech-card__grid" role="list" aria-label="Technologies used">
+            <% (typeof techStack !== 'undefined' ? techStack : []).forEach(function(t) { %>
+              <div class="cs-tech-icon<%= t.invert ? ' cs-tech-icon--invert' : '' %>" role="listitem" title="<%= t.name %>" aria-label="<%= t.name %>">
+                <% if (t.url) { %>
+                <div class="cs-tech-icon__logo">
+                  <img src="<%= t.url %>" alt="<%= t.name %>" loading="lazy" decoding="async" class="cs-tech-icon__img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <span class="cs-tech-icon__abbr cs-tech-icon__abbr--fallback" style="display:none;"><%= t.abbr %></span>
+                </div>
+                <% } else { %>
+                <div class="cs-tech-icon__logo">
+                  <span class="cs-tech-icon__abbr"><%= t.abbr %></span>
+                </div>
+                <% } %>
+                <span class="cs-tech-icon__name"><%= t.name %></span>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ─── SECTION 02: KEY FEATURES ────────────────────────────── -->
+<% var _feats = project.fullFeatures && project.fullFeatures.length ? project.fullFeatures : (project.features || []); %>
+<% if (_feats.length) { %>
+<section id="cs-solution" class="cs-section cs-section--dark">
+  <div class="cs-section__inner">
+
+    <div class="cs-section-label cs-section-label--center" style="color: var(--ac);">
+      <span class="cs-section-label__num">02</span>
+      <span class="cs-section-label__line"></span>
+      <span>Key Features</span>
+      <span class="cs-section-label__line"></span>
+    </div>
+    <h2 class="cs-section-title cs-section-title--center">Built to Perform</h2>
+    <p class="cs-section-sub">Every feature designed with purpose, precision, and real-world usage in mind.</p>
+
+    <div class="cs-features">
+      <% _feats.forEach(function(feat, i) { %>
+        <% if (typeof feat === 'object') { %>
+          <div class="cs-feat" style="--ac: <%= project.color %>;">
+            <div class="cs-feat__icon">
+              <i data-lucide="<%= feat.icon %>"></i>
+            </div>
+            <h3 class="cs-feat__title"><%= feat.title %></h3>
+            <p class="cs-feat__desc"><%= feat.desc %></p>
+          </div>
+        <% } else { %>
+          <div class="cs-feat" style="--ac: <%= project.color %>;">
+            <div class="cs-feat__icon">
+              <i data-lucide="star"></i>
+            </div>
+            <h3 class="cs-feat__title"><%= feat %></h3>
+          </div>
+        <% } %>
+      <% }); %>
+    </div>
+
+  </div>
+</section>
+<% } %>
+
+
+<!-- ─── ECOSYSTEM / INTEGRATED SYSTEMS ───────────────────────── -->
+<% if (project.isEcosystem && project.subProjects && project.subProjects.length) { %>
+<section id="cs-ecosystem" class="cs-section cs-section--dark">
+  <div class="cs-section__inner">
+
+    <div class="cs-section-label cs-section-label--center" style="color: var(--ac);">
+      <% if (!_feats.length) { %>
+      <span class="cs-section-label__num">02</span>
+      <% } %>
+      <span class="cs-section-label__line"></span>
+      <span><%= project.ecosystemSectionLabel || 'Integrated Systems' %></span>
+      <span class="cs-section-label__line"></span>
+    </div>
+    <h2 class="cs-section-title cs-section-title--center"><%= project.ecosystemTitle || 'A Complete Ecosystem' %></h2>
+    <p class="cs-section-sub"><%= project.ecosystemSubtitle || 'A suite of tightly integrated modules working as one unified platform.' %></p>
+
+    <div class="cs-modules">
+      <% project.subProjects.forEach(function(sub, i) { %>
+        <div class="cs-module" style="--ac: <%= project.color %>;" data-index="<%= i %>">
+          <div class="cs-module__top">
+            <div class="cs-module__icon">
+              <i data-lucide="<%= sub.icon %>"></i>
+            </div>
+            <div class="cs-module__num">0<%= i + 1 %></div>
+          </div>
+          <h3 class="cs-module__name"><%= sub.name %></h3>
+          <p class="cs-module__desc"><%= sub.fullDesc || sub.desc %></p>
+          <% if (sub.features && sub.features.length) { %>
+            <ul class="cs-module__list">
+              <% sub.features.forEach(function(f) { %>
+                <li>
+                  <span class="cs-module__check"><i data-lucide="check"></i></span>
+                  <%= f %>
+                </li>
+              <% }); %>
+            </ul>
+          <% } %>
+        </div>
+      <% }); %>
+    </div>
+
+  </div>
+</section>
+<% } %>
+
+
+<!-- ─── SECTION 03: RESULTS & IMPACT ─────────────────────────── -->
+<section id="cs-results" class="cs-section cs-section--light">
+  <div class="cs-section__inner">
+
+    <div class="cs-section-label cs-section-label--center" style="color: var(--ac);">
+      <span class="cs-section-label__num">03</span>
+      <span class="cs-section-label__line"></span>
+      <span>Results & Impact</span>
+      <span class="cs-section-label__line"></span>
+    </div>
+    <h2 class="cs-section-title cs-section-title--center">Measurable Outcomes</h2>
+    <p class="cs-section-sub">Real numbers from real deployment — results that speak for themselves.</p>
+
+    <div class="cs-results">
+      <% project.results.forEach(function(r, i) { %>
+        <div class="cs-result" style="--ac: <%= project.color %>; --delay: <%= i * 80 %>ms;">
+          <div class="cs-result__glow"></div>
+          <div class="cs-result__top">
+            <div class="cs-result__bar"></div>
+          </div>
+          <div class="cs-result__val"><%= r.value %></div>
+          <div class="cs-result__label"><%= r.label %></div>
+          <div class="cs-result__desc"><%= r.desc %></div>
+        </div>
+      <% }); %>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ─── CTA ──────────────────────────────────────────────────── -->
+<section id="cs-cta" class="cs-cta" style="--ac: <%= project.color %>;" aria-labelledby="cs-cta-heading">
+  <div class="cs-cta__ambient" aria-hidden="true">
+    <div class="cs-cta__mesh"></div>
+    <div class="cs-cta__orb cs-cta__orb--a"></div>
+    <div class="cs-cta__orb cs-cta__orb--b"></div>
+    <div class="cs-cta__ring"></div>
+  </div>
+  <div class="cs-cta__shell">
+    <div class="cs-cta__panel">
+      <p class="cs-cta__eyebrow">Next step</p>
+      <h2 id="cs-cta-heading" class="cs-cta__headline">
+        Ready to build something <span class="cs-cta__headline-accent">exceptional</span>?
+      </h2>
+      <p class="cs-cta__lead">Tell us about your product, timeline, and goals &mdash; we'll respond with a clear plan and honest timeline.</p>
+      <div class="cs-cta__actions">
+        <a href="/#contact" class="cs-cta__btn cs-cta__btn--primary">
+          <span>Start your project</span>
+          <i data-lucide="arrow-right" aria-hidden="true"></i>
+        </a>
+        <a href="/#portfolio" class="cs-cta__btn cs-cta__btn--secondary">
+          <i data-lucide="layout-grid" aria-hidden="true"></i>
+          <span>Browse work</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<%- include('partials/footer') %>
+
+
+<!-- ─── SCRIPTS ───────────────────────────────────────────────── -->
+<script>
+(function () {
+
+  /* ── Lucide init ── */
+  if (window.lucide) lucide.createIcons();
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.lucide) lucide.createIcons();
+    initCaseStudyPageNav();
+  });
+
+  function initCaseStudyPageNav() {
+    var scroll = document.getElementById('csPageNavScroll');
+    if (!scroll) return;
+
+    var navOffset = 88;
+    var sectionIds = ['cs-top', 'cs-overview', 'cs-solution', 'cs-results', 'cs-cta'];
+
+    function getActiveId() {
+      var y = window.scrollY + navOffset;
+      var id = sectionIds[0];
+      for (var i = 0; i < sectionIds.length; i++) {
+        var el = document.getElementById(sectionIds[i]);
+        if (!el) continue;
+        var top = el.getBoundingClientRect().top + window.scrollY;
+        if (top <= y) id = sectionIds[i];
+      }
+      return id;
+    }
+
+    function syncFromScroll() {
+      var id = getActiveId();
+      scroll.querySelectorAll('a[data-cs-page]').forEach(function (a) {
+        var href = a.getAttribute('href') || '';
+        var on = href === '#' + id;
+        a.classList.toggle('is-active', on);
+        if (on) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      });
+    }
+
+    window.addEventListener('scroll', syncFromScroll, { passive: true });
+    window.addEventListener('resize', syncFromScroll);
+
+    scroll.addEventListener('click', function (e) {
+      var a = e.target.closest('a[data-cs-page]');
+      if (!a || !scroll.contains(a)) return;
+      var href = a.getAttribute('href');
+      if (!href || href.charAt(0) !== '#') return;
+      var target = document.getElementById(href.slice(1));
+      if (!target) return;
+      e.preventDefault();
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      if (history.pushState) {
+        try {
+          history.pushState(null, '', href);
+        } catch (err) {}
+      }
+      requestAnimationFrame(syncFromScroll);
+    });
+
+    syncFromScroll();
+    var activeLink = scroll.querySelector('a.navbar-cs__tab.is-active');
+    if (activeLink) {
+      try {
+        activeLink.scrollIntoView({ inline: 'center', block: 'nearest' });
+      } catch (err) {}
+    }
+  }
+
+  /* ── Scroll-reveal ── */
+  const observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('cs-revealed');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.cs-module, .cs-feat, .cs-result, .cs-pill, .cs-detail-card, .cs-tech-card').forEach(function (el) {
+    el.classList.add('cs-reveal');
+    observer.observe(el);
+  });
+
+  /* ── Counter animation ── */
+  function animateCounter(el) {
+    const text = el.textContent.trim();
+    const num = parseFloat(text.replace(/[^0-9.]/g, ''));
+    if (isNaN(num) || num === 0) return;
+    const suffix = text.replace(/[0-9.]/g, '');
+    const dur = 1400;
+    const start = performance.now();
+    function step(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      const cur = Math.round(ease * num * 10) / 10;
+      el.textContent = (cur % 1 === 0 ? cur : cur.toFixed(1)) + suffix;
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const resultObs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.cs-result__val').forEach(animateCounter);
+        resultObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll('.cs-results').forEach(function (el) { resultObs.observe(el); });
+
+})();
+
+
+/* ─── Dual Viewer ─── */
+var _shots   = <%- JSON.stringify(project.mobileScreenshots || []) %>;
+var _webImgs = <%- JSON.stringify([project.image].concat(project.extraImages || [])) %>;
+var _wi = 0; /* active web index  */
+var _mi = 0; /* active mob index  */
+
+/* helpers */
+function _setActive(selector, index) {
+  document.querySelectorAll(selector).forEach(function(el, i) {
+    el.classList.toggle('cs-slide--active', i === index);
+  });
+}
+function _setDot(containerId, index) {
+  var c = document.getElementById(containerId);
+  if (!c) return;
+  c.querySelectorAll('.cs-dv-dot').forEach(function(d, i) {
+    d.classList.toggle('cs-dv-dot--on', i === index);
+  });
+}
+
+/* switch tabs */
+function switchViewer(mode) {
+  var pW = document.getElementById('panelWeb');
+  var pM = document.getElementById('panelMobile');
+  var tW = document.getElementById('tabWeb');
+  var tM = document.getElementById('tabMobile');
+  if (mode === 'mobile') {
+    if (pW) pW.classList.add('cs-dv-panel--hidden');
+    if (pM) pM.classList.remove('cs-dv-panel--hidden');
+    if (tW) tW.classList.remove('cs-dv-tab--active');
+    if (tM) tM.classList.add('cs-dv-tab--active');
+  } else {
+    if (pM) pM.classList.add('cs-dv-panel--hidden');
+    if (pW) pW.classList.remove('cs-dv-panel--hidden');
+    if (tM) tM.classList.remove('cs-dv-tab--active');
+    if (tW) tW.classList.add('cs-dv-tab--active');
+  }
+}
+
+/* web slider */
+function goToWeb(i) {
+  var total = _webImgs.length;
+  if (i < 0) i = total - 1;
+  if (i >= total) i = 0;
+  _wi = i;
+  _setActive('.cs-slide--web', i);
+  _setDot('webDots', i);
+}
+function webNav(dir) { goToWeb(_wi + dir); }
+
+/* mobile slider */
+function goToMobile(i) {
+  var total = _shots.length;
+  if (i < 0) i = total - 1;
+  if (i >= total) i = 0;
+  _mi = i;
+  _setActive('.cs-slide--mob', i);
+  _setDot('mobileDots', i);
+  var cur = document.getElementById('mobCur');
+  var cap = document.getElementById('mobCaption');
+  if (cur) cur.textContent = i + 1;
+  if (cap) cap.textContent = (_shots[i] && _shots[i].caption) ? _shots[i].caption : '';
+}
+function mobileNav(dir) { goToMobile(_mi + dir); }
+
+/* touch swipe on phone display */
+(function() {
+  var el = document.querySelector('.cs-phone2__display');
+  if (!el) return;
+  var sx = 0;
+  el.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, { passive: true });
+  el.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 36) mobileNav(dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
+
+/* touch swipe on browser viewport */
+(function() {
+  var el = document.querySelector('.cs-browser-viewport');
+  if (!el) return;
+  var sx = 0;
+  el.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, { passive: true });
+  el.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 36) webNav(dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
+
+/* scroll wheel on both viewers */
+(function() {
+  var bv = document.querySelector('.cs-browser-viewport');
+  if (bv) bv.addEventListener('wheel', function(e){ e.preventDefault(); webNav(e.deltaY > 0 ? 1 : -1); }, { passive: false });
+  var pd = document.querySelector('.cs-phone2__display');
+  if (pd) pd.addEventListener('wheel', function(e){ e.preventDefault(); mobileNav(e.deltaY > 0 ? 1 : -1); }, { passive: false });
+})();
+
+</script>
