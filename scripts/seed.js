@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ============================================================
-   Seed admin user + default projects (idempotent upserts)
+   Seed admin user, default projects, and default team (idempotent)
    Usage: npm run seed
    Env: MONGODB_URI, ADMIN_EMAIL, ADMIN_PASSWORD
    ============================================================ */
@@ -10,7 +10,9 @@ require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }
 const mongoose = require('mongoose');
 const Admin = require('../models/Admin');
 const Project = require('../models/Project');
+const TeamMember = require('../models/TeamMember');
 const defaultProjects = require('../lib/seedDefaultProjects');
+const defaultTeam = require('../lib/seedDefaultTeam');
 
 async function main() {
   const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/qimora';
@@ -39,6 +41,14 @@ async function main() {
     const data = { ...defaultProjects[i], order: defaultProjects[i].order ?? i };
     await Project.findOneAndUpdate({ slug: data.slug }, { $set: data }, { upsert: true, new: true });
     console.log('✦  Project upserted:', data.slug);
+  }
+
+  const teamCount = await TeamMember.countDocuments();
+  if (teamCount === 0) {
+    await TeamMember.insertMany(defaultTeam);
+    console.log('✦  Default team members inserted:', defaultTeam.length);
+  } else {
+    console.log('✦  Team members already exist (' + teamCount + '), skip team seed.');
   }
 
   await mongoose.disconnect();

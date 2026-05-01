@@ -6,10 +6,14 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const mongoose = require('mongoose');
+
 const Admin = require('../models/Admin');
 const Project = require('../models/Project');
 const Contact = require('../models/Contact');
 const MeetingBooking = require('../models/MeetingBooking');
+const TeamMember = require('../models/TeamMember');
+const { TEAM_THEME_PRESETS, THEME_COUNT } = require('../lib/teamThemes');
+const { clampTheme, normalizeSocialUrl } = require('../lib/teamMemberView');
 const { formatInZone, CAIRO_ZONE } = require('../lib/bookingAvailability');
 const { DateTime } = require('luxon');
 const { sendMailSafe, isSmtpConfigured, getPublicSiteUrl, getBrandedLogoEmailParts } = require('../lib/mail/mailer');
@@ -38,17 +42,18 @@ function projectFormViewData(locals) {
 
 async function getInboxNavCounts() {
   try {
-    const [unreadMessageCount, upcomingMeetingCount] = await Promise.all([
+    const [unreadMessageCount, upcomingMeetingCount, teamMemberCount] = await Promise.all([
       Contact.countDocuments({ read: { $ne: true } }),
       MeetingBooking.countDocuments({
         startsAt: { $gte: new Date() },
         status: { $in: ['pending', 'confirmed'] }
-      })
+      }),
+      TeamMember.countDocuments()
     ]);
-    return { unreadMessageCount, upcomingMeetingCount };
+    return { unreadMessageCount, upcomingMeetingCount, teamMemberCount };
   } catch (err) {
     console.error('Nav counts:', err.message);
-    return { unreadMessageCount: 0, upcomingMeetingCount: 0 };
+    return { unreadMessageCount: 0, upcomingMeetingCount: 0, teamMemberCount: 0 };
   }
 }
 
@@ -244,6 +249,84 @@ const uploadFields = upload.fields([
   { name: 'screenshots', maxCount: 10 },
   { name: 'extraWebImages', maxCount: 12 }
 ]);
+
+const TEAM_UPLOAD_REL = '/uploads/team';
+const TEAM_UPLOAD_DIR = path.join(__dirname, '..', 'public', 'uploads', 'team');
+
+function ensureTeamUploadDir() {
+  try {
+    fs.mkdirSync(TEAM_UPLOAD_DIR, { recursive: true });
+  } catch (e) {
+    console.error('Team upload dir:', e.message);
+  }
+}
+
+const teamStorage = multer.diskStorage({
+  destination(_req, _file, cb) {
+    ensureTeamUploadDir();
+    cb(null, TEAM_UPLOAD_DIR);
+  },
+  filename(_req, file, cb) {
+    const ext = path.extname(file.originalname || '').slice(0, 12) || '.bin';
+    const base = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `${base}${ext}`);
+  }
+});
+
+const teamUpload = multer({
+  storage: teamStorage,
+  limits: { fileSize: 12 * 1024 * 1024 },
+  fileFilter(_req, file, cb) {
+    const ok = /^image\//.test(file.mimetype || '');
+    if (!ok) return cb(new Error('Only image uploads are allowed'));
+    cb(null, true);
+  }
+});
+
+const teamPhotoMiddleware = teamUpload.single('photo');
+
+function buildTeamMemberPayload(req) {
+  const b = req.body;
+  let image = String(b.image || '').trim();
+  if (req.file) {
+    image = `${TEAM_UPLOAD_REL}/${req.file.filename}`;
+  } else if (image && !/^https?:\/\//i.test(image) && !image.startsWith('/')) {
+    image = `/${image.replace(/^\/+/, '')}`;
+  }
+  return {
+    name: String(b.name || '').trim(),
+    role: String(b.role || '').trim(),
+    specialty: String(b.specialty || '').trim(),
+    years: Math.min(99, Math.max(0, Number.parseInt(String(b.years), 10) || 0)),
+    description: String(b.description || '').trim(),
+    image,
+    theme: clampTheme(b.theme),
+    socialGithub: normalizeSocialUrl(b.socialGithub),
+    socialLinkedin: normalizeSocialUrl(b.socialLinkedin),
+    order: Number.parseInt(b.order, 10) || 0,
+    isPublished: parseBool(b.isPublished)
+  };
+}
+
+function teamFormLocals(extra) {
+  return {
+    teamThemes: TEAM_THEME_PRESETS.map((preset, i) => ({
+      id: i + 1,
+      label: `Theme ${i + 1}`,
+      accent: preset.accent,
+      bgGradient: preset.bgGradient
+    })),
+    themeCount: THEME_COUNT,
+    ...extra
+  };
+}
+
+function maybeUnlinkTeamImage(imagePath) {
+  if (!imagePath || !String(imagePath).startsWith(TEAM_UPLOAD_REL)) return;
+  const rel = String(imagePath).replace(/^\/+/, '');
+  const full = path.join(__dirname, '..', 'public', rel);
+  fs.unlink(full, () => {});
+}
 
 function slugify(str) {
   return String(str || '')
@@ -877,6 +960,51 @@ exports.messageDelete = async (req, res) => {
   }
 };
 
+exports.messagesBulk = async (req, res) => {
+  const returnQuery = String(req.body.returnQuery || '').trim();
+  const action = String(req.body.bulkAction || '').trim();
+  const ids = parseBulkMeetingIds(req.body);
+  try {
+    if (!['read', 'delete'].includes(action)) {
+      req.session.flash = { type: 'err', msg: 'Unknown bulk action.' };
+      return redirectInbox(res, '/admin/messages', returnQuery);
+    }
+    if (!ids.length) {
+      req.session.flash = { type: 'err', msg: 'Select at least one message.' };
+      return redirectInbox(res, '/admin/messages', returnQuery);
+    }
+    const oidList = ids.map((id) => new mongoose.Types.ObjectId(id));
+    if (action === 'delete') {
+      const r = await Contact.deleteMany({ _id: { $in: oidList } });
+      req.session.flash = {
+        type: 'ok',
+        msg: r.deletedCount === 1 ? '1 message deleted.' : `${r.deletedCount} messages deleted.`
+      };
+    } else {
+      const r = await Contact.updateMany({ _id: { $in: oidList } }, { $set: { read: true } });
+      if (r.modifiedCount === 0) {
+        req.session.flash = {
+          type: 'ok',
+          msg: 'No changes — selected message(s) were already marked read.'
+        };
+      } else {
+        req.session.flash = {
+          type: 'ok',
+          msg:
+            r.modifiedCount === 1
+              ? '1 message marked as read.'
+              : `${r.modifiedCount} messages marked as read.`
+        };
+      }
+    }
+    redirectInbox(res, '/admin/messages', returnQuery);
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Bulk action failed.' };
+    redirectInbox(res, '/admin/messages', returnQuery);
+  }
+};
+
 exports.listMeetings = async (req, res) => {
   try {
     const filter = buildMeetingMongoFilter(req);
@@ -1156,5 +1284,228 @@ exports.meetingCancel = async (req, res) => {
 exports.meetingDelete = async (req, res) => {
   await meetingActionRedirect(req, res, performMeetingDelete);
 };
+
+// ---------- Team members (Meet Our Team) ----------
+
+exports.listTeam = async (req, res) => {
+  try {
+    const [members, inboxNav] = await Promise.all([
+      TeamMember.find().sort({ order: 1, name: 1 }).lean(),
+      getInboxNavCounts()
+    ]);
+    res.render('admin/team-list', {
+      layout: false,
+      title: 'Team — Admin',
+      members,
+      teamThemes: TEAM_THEME_PRESETS,
+      flash: req.session.flash,
+      adminEmail: req.session.adminEmail,
+      currentPage: 'team',
+      ...inboxNav
+    });
+    delete req.session.flash;
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to load team');
+  }
+};
+
+exports.newTeamMember = async (req, res) => {
+  try {
+    const count = await TeamMember.countDocuments();
+    const inboxNav = await getInboxNavCounts();
+    const blank = {
+      name: '',
+      role: '',
+      specialty: '',
+      years: 5,
+      description: '',
+      image: '',
+      theme: 1,
+      socialGithub: '',
+      socialLinkedin: '',
+      order: count,
+      isPublished: true
+    };
+    res.render(
+      'admin/team-form',
+      teamFormLocals({
+        layout: false,
+        title: 'New team member',
+        member: blank,
+        isEdit: false,
+        error: null,
+        adminEmail: req.session.adminEmail,
+        ...inboxNav
+      })
+    );
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error');
+  }
+};
+
+exports.createTeamMember = async (req, res) => {
+  const inboxNav = await getInboxNavCounts();
+  const count = await TeamMember.countDocuments();
+  try {
+    const payload = buildTeamMemberPayload(req);
+    if (!payload.name || !payload.specialty) {
+      throw new Error('Name and specialty are required.');
+    }
+    if (!payload.image) {
+      throw new Error('Add a photo (upload or paste an image URL).');
+    }
+    await TeamMember.create(payload);
+    req.session.flash = { type: 'ok', msg: 'Team member created.' };
+    res.redirect('/admin/team');
+  } catch (err) {
+    console.error(err);
+    if (req.file && req.file.path) {
+      fs.unlink(req.file.path, () => {});
+    }
+    const blank = {
+      name: String(req.body.name || '').trim(),
+      role: String(req.body.role || '').trim(),
+      specialty: String(req.body.specialty || '').trim(),
+      years: Math.min(99, Math.max(0, Number.parseInt(String(req.body.years), 10) || 0)),
+      description: String(req.body.description || '').trim(),
+      image: String(req.body.image || '').trim(),
+      theme: clampTheme(req.body.theme),
+      socialGithub: String(req.body.socialGithub || '').trim(),
+      socialLinkedin: String(req.body.socialLinkedin || '').trim(),
+      order: Number.parseInt(req.body.order, 10) || count,
+      isPublished: parseBool(req.body.isPublished)
+    };
+    res.status(400).render(
+      'admin/team-form',
+      teamFormLocals({
+        layout: false,
+        title: 'New team member',
+        member: blank,
+        isEdit: false,
+        error: err.message || 'Could not save',
+        adminEmail: req.session.adminEmail,
+        ...inboxNav
+      })
+    );
+  }
+};
+
+exports.editTeamMember = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).send('Not found');
+    }
+    const member = await TeamMember.findById(req.params.id).lean();
+    if (!member) return res.status(404).send('Not found');
+    const inboxNav = await getInboxNavCounts();
+    res.render(
+      'admin/team-form',
+      teamFormLocals({
+        layout: false,
+        title: `Edit — ${member.name}`,
+        member,
+        isEdit: true,
+        error: null,
+        adminEmail: req.session.adminEmail,
+        ...inboxNav
+      })
+    );
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error');
+  }
+};
+
+exports.updateTeamMember = async (req, res) => {
+  const inboxNav = await getInboxNavCounts();
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).send('Not found');
+    }
+    const doc = await TeamMember.findById(req.params.id);
+    if (!doc) return res.status(404).send('Not found');
+    const payload = buildTeamMemberPayload(req);
+    if (!payload.name || !payload.specialty) {
+      throw new Error('Name and specialty are required.');
+    }
+    if (!payload.image) {
+      throw new Error('Keep the current photo or upload a new one (or paste an image URL).');
+    }
+    const oldImage = doc.image;
+    if (req.file && oldImage && oldImage !== payload.image && String(oldImage).startsWith(TEAM_UPLOAD_REL)) {
+      maybeUnlinkTeamImage(oldImage);
+    }
+    Object.assign(doc, payload);
+    await doc.save();
+    req.session.flash = { type: 'ok', msg: 'Team member updated.' };
+    res.redirect('/admin/team');
+  } catch (err) {
+    console.error(err);
+    if (req.file && req.file.path) {
+      fs.unlink(req.file.path, () => {});
+    }
+    const member = await TeamMember.findById(req.params.id).lean();
+    if (!member) return res.status(404).send('Not found');
+    const merged = { ...member, ...buildTeamMemberPayload(req) };
+    res.status(400).render(
+      'admin/team-form',
+      teamFormLocals({
+        layout: false,
+        title: `Edit — ${member.name}`,
+        member: merged,
+        isEdit: true,
+        error: err.message || 'Could not save',
+        adminEmail: req.session.adminEmail,
+        ...inboxNav
+      })
+    );
+  }
+};
+
+exports.deleteTeamMember = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).send('Not found');
+    }
+    const doc = await TeamMember.findById(req.params.id);
+    if (!doc) {
+      req.session.flash = { type: 'err', msg: 'Member not found.' };
+      return res.redirect('/admin/team');
+    }
+    maybeUnlinkTeamImage(doc.image);
+    await TeamMember.deleteOne({ _id: doc._id });
+    req.session.flash = { type: 'ok', msg: 'Team member removed.' };
+    res.redirect('/admin/team');
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Delete failed.' };
+    res.redirect('/admin/team');
+  }
+};
+
+exports.toggleTeamPublish = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).send('Not found');
+    }
+    const doc = await TeamMember.findById(req.params.id);
+    if (!doc) return res.status(404).send('Not found');
+    doc.isPublished = !doc.isPublished;
+    await doc.save();
+    req.session.flash = {
+      type: 'ok',
+      msg: doc.isPublished ? 'Member is now published on the site.' : 'Member hidden from the site.'
+    };
+    res.redirect('/admin/team');
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Could not update publish state.' };
+    res.redirect('/admin/team');
+  }
+};
+
+exports.teamPhotoMiddleware = teamPhotoMiddleware;
 
 exports.uploadMiddleware = uploadFields;

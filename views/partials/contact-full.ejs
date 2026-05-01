@@ -1,0 +1,494 @@
+<!-- ============================================================
+     CONTACT SECTION
+     ============================================================ -->
+<section id="contact" class="contact-section">
+  <canvas id="contact-canvas" class="hero__canvas contact-section__canvas" aria-hidden="true"></canvas>
+
+  <div class="hero__glow hero__glow--top" aria-hidden="true"></div>
+  <div class="hero__glow hero__glow--bottom" aria-hidden="true"></div>
+  <div class="hero__glow hero__glow--center" aria-hidden="true"></div>
+  <div class="hero__grid-overlay" aria-hidden="true"></div>
+
+  <div class="contact-section__inner">
+
+    <!-- ── LEFT — contact info ── -->
+    <div class="contact-info anim-fade-up" data-delay="0">
+
+      <div class="contact-info__label">Get in touch</div>
+      <h2 class="contact-info__title">
+        Let's Build Something<br />
+        <span class="gradient-text--orange">Extraordinary.</span>
+      </h2>
+      <p class="contact-info__lead">
+        Have a project in mind? Drop us a message and we'll get back to you within 3 hours.
+      </p>
+
+      <ul class="contact-info__list" aria-label="Contact channels">
+
+        <li class="contact-info__item">
+          <span class="contact-info__icon-wrap" aria-hidden="true">
+            <i data-lucide="phone"></i>
+          </span>
+          <div class="contact-info__detail">
+            <span class="contact-info__detail-label">Phone</span>
+            <a href="tel:+201156012078" class="contact-info__detail-value">+20 115 601 2078</a>
+     
+          </div>
+        </li>
+
+        <li class="contact-info__item">
+          <span class="contact-info__icon-wrap" aria-hidden="true">
+            <i data-lucide="mail"></i>
+          </span>
+          <div class="contact-info__detail">
+            <span class="contact-info__detail-label">Email</span>
+            <a href="mailto:info@qimora.io" class="contact-info__detail-value">info@qimora.io</a>
+      
+          </div>
+        </li>
+
+        <li class="contact-info__item">
+          <span class="contact-info__icon-wrap contact-info__icon-wrap--wa" aria-hidden="true">
+            <i class="fa-brands fa-whatsapp"></i>
+          </span>
+          <div class="contact-info__detail">
+            <span class="contact-info__detail-label">WhatsApp</span>
+            <a href="https://wa.me/201156012078" target="_blank" rel="noopener noreferrer" class="contact-info__detail-value">Chat on WhatsApp</a>
+          </div>
+        </li>
+
+      </ul>
+
+      <div class="contact-info__badges">
+        <span class="contact-info__badge"><i data-lucide="shield-check"></i>Free Consultation</span>
+        <span class="contact-info__badge"><i data-lucide="clock"></i>3h Response</span>
+        <span class="contact-info__badge"><i data-lucide="lock"></i>100% Confidential</span>
+      </div>
+
+    </div>
+
+    <!-- ── RIGHT — tabbed contact panel ── -->
+    <div class="contact-form-wrap anim-fade-up" data-delay="120">
+
+      <!-- Tab switcher -->
+      <div class="ctab__switcher" role="tablist" aria-label="Contact options">
+        <button class="ctab__btn ctab__btn--active" id="ctab-msg-btn" role="tab" aria-selected="true" aria-controls="ctab-msg" data-tab="msg">
+          <i data-lucide="send" aria-hidden="true"></i>
+          Send Message
+        </button>
+        <button class="ctab__btn" id="ctab-book-btn" role="tab" aria-selected="false" aria-controls="ctab-book" data-tab="book">
+          <i data-lucide="calendar" aria-hidden="true"></i>
+          Book Meeting
+        </button>
+      </div>
+
+      <!-- ══ TAB 1 — Send Message ══ -->
+      <div class="ctab__panel ctab__panel--active" id="ctab-msg" role="tabpanel" aria-labelledby="ctab-msg-btn">
+      <form class="contact-form" id="contact-form" novalidate autocomplete="off">
+
+        <div id="cf-form-panel" class="form-stack">
+        <div class="contact-form__row contact-form__row--2col">
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="cf-name">
+              Full Name <span class="contact-form__required" aria-hidden="true">*</span>
+            </label>
+            <div class="contact-form__input-wrap">
+              <i data-lucide="user" class="contact-form__input-icon" aria-hidden="true"></i>
+              <input
+                class="contact-form__input"
+                type="text"
+                id="cf-name"
+                name="name"
+                placeholder="John Smith"
+                required
+                autocomplete="name"
+                aria-required="true"
+              />
+            </div>
+            <span class="contact-form__error" id="cf-name-err" role="alert"></span>
+          </div>
+
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="cf-company">
+              Company <span class="contact-form__optional">(optional)</span>
+            </label>
+            <div class="contact-form__input-wrap">
+              <i data-lucide="building-2" class="contact-form__input-icon" aria-hidden="true"></i>
+              <input
+                class="contact-form__input"
+                type="text"
+                id="cf-company"
+                name="company"
+                placeholder="Your company"
+                autocomplete="organization"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form__field">
+          <label class="contact-form__label" for="cf-email">
+            Email Address <span class="contact-form__required" aria-hidden="true">*</span>
+          </label>
+          <div class="contact-form__input-wrap">
+            <i data-lucide="mail" class="contact-form__input-icon" aria-hidden="true"></i>
+            <input
+              class="contact-form__input"
+              type="email"
+              id="cf-email"
+              name="email"
+              placeholder="you@company.com"
+              required
+              autocomplete="email"
+              aria-required="true"
+            />
+          </div>
+          <span class="contact-form__error" id="cf-email-err" role="alert"></span>
+        </div>
+
+        <!-- WhatsApp toggle -->
+        <div class="contact-form__field">
+          <div class="cf-wa__toggle-row">
+            <label class="cf-wa__toggle-label" for="cf-wa-toggle">
+              <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+              Available on WhatsApp?
+            </label>
+            <button type="button" class="cf-wa__toggle" id="cf-wa-toggle" role="switch" aria-checked="false" aria-label="I have WhatsApp on this number">
+              <span class="cf-wa__toggle-knob"></span>
+            </button>
+          </div>
+          <div class="cf-wa__phone-wrap" id="cf-wa-phone-wrap" hidden>
+            <div class="contact-form__input-wrap">
+              <i class="fa-brands fa-whatsapp contact-form__input-icon" aria-hidden="true" style="color:#25D366"></i>
+              <input class="contact-form__input" type="tel" id="cf-wa-phone" name="whatsapp" placeholder="+1 (234) 567-890" autocomplete="tel" />
+            </div>
+            <span class="cf-wa__hint">We'll reach you via WhatsApp at this number.</span>
+          </div>
+        </div>
+
+        <div class="contact-form__field">
+          <label class="contact-form__label" for="cf-subject">
+            Subject <span class="contact-form__required" aria-hidden="true">*</span>
+          </label>
+          <div class="contact-form__input-wrap contact-form__input-wrap--select">
+            <i data-lucide="layers" class="contact-form__input-icon" aria-hidden="true"></i>
+            <select class="contact-form__input contact-form__select" id="cf-subject" name="subject" required aria-required="true">
+              <option value="" disabled selected>Select a topic…</option>
+              <optgroup label="Development">
+                <option value="web-dev">Website Development</option>
+                <option value="mobile-app">Mobile App Development (iOS / Android)</option>
+                <option value="fullstack">Full-Stack Web Application</option>
+                <option value="ecommerce">E-Commerce Platform</option>
+                <option value="api">API / Backend Development</option>
+                <option value="saas">SaaS Product Development</option>
+              </optgroup>
+              <optgroup label="Design">
+                <option value="ui-ux">UI / UX Design</option>
+                <option value="branding">Brand Identity & Logo</option>
+                <option value="prototyping">Prototyping & Wireframing</option>
+                <option value="design-system">Design System</option>
+              </optgroup>
+              <optgroup label="Cloud & Infrastructure">
+                <option value="devops">DevOps & CI/CD Pipeline</option>
+                <option value="cloud">Cloud Migration (AWS / Azure / GCP)</option>
+                <option value="hosting">Hosting & Server Setup</option>
+                <option value="security">Cybersecurity & Penetration Testing</option>
+              </optgroup>
+              <optgroup label="Data & AI">
+                <option value="data">Data Analytics & Dashboards</option>
+                <option value="ml">Machine Learning / AI Integration</option>
+                <option value="automation">Business Process Automation</option>
+              </optgroup>
+              <optgroup label="Consulting & Support">
+                <option value="consulting">Technical Consulting</option>
+                <option value="code-review">Code Review & Audit</option>
+                <option value="enterprise">Enterprise System Integration</option>
+                <option value="support">Ongoing Maintenance & Support</option>
+              </optgroup>
+              <optgroup label="Other">
+                <option value="other">Other — I'll describe below</option>
+              </optgroup>
+            </select>
+            <i data-lucide="chevron-down" class="contact-form__select-chevron" aria-hidden="true"></i>
+          </div>
+          <span class="contact-form__error" id="cf-subject-err" role="alert"></span>
+        </div>
+
+        <!-- "Other" custom subject — revealed when user picks Other -->
+        <div class="contact-form__field" id="cf-other-wrap" hidden>
+          <label class="contact-form__label" for="cf-other-subject">
+            Describe your subject <span class="contact-form__required" aria-hidden="true">*</span>
+          </label>
+          <div class="contact-form__input-wrap">
+            <i data-lucide="pencil" class="contact-form__input-icon" aria-hidden="true"></i>
+            <input
+              class="contact-form__input"
+              type="text"
+              id="cf-other-subject"
+              name="other_subject"
+              placeholder="Tell us what you need…"
+              autocomplete="off"
+            />
+          </div>
+          <span class="contact-form__error" id="cf-other-err" role="alert"></span>
+        </div>
+
+        <div class="contact-form__field">
+          <label class="contact-form__label" for="cf-message">
+            Message <span class="contact-form__required" aria-hidden="true">*</span>
+          </label>
+          <div class="contact-form__input-wrap contact-form__input-wrap--textarea">
+            <i data-lucide="message-square" class="contact-form__input-icon contact-form__input-icon--ta" aria-hidden="true"></i>
+            <textarea
+              class="contact-form__input contact-form__textarea"
+              id="cf-message"
+              name="message"
+              placeholder="Tell us about your project — goals, timeline, budget…"
+              rows="5"
+              required
+              aria-required="true"
+            ></textarea>
+          </div>
+          <span class="contact-form__error" id="cf-message-err" role="alert"></span>
+        </div>
+
+        <button type="submit" class="contact-form__submit" id="cf-submit">
+          <span class="contact-form__submit-text">Send Message</span>
+          <i data-lucide="send" class="contact-form__submit-icon"></i>
+          <span class="contact-form__submit-spinner" aria-hidden="true"></span>
+        </button>
+
+        <p class="contact-form__privacy">
+          <i data-lucide="lock" aria-hidden="true"></i>
+          Your information is private and will never be shared.
+        </p>
+
+        <div class="contact-form__toast contact-form__toast--error" id="cf-toast-err" role="alert" hidden>
+          <i data-lucide="alert-circle"></i>
+          <span id="cf-toast-err-msg">Something went wrong. Please try again or email us directly.</span>
+        </div>
+        </div><!-- /cf-form-panel -->
+
+        <div class="form-success" id="cf-success" role="status" aria-live="polite" hidden>
+          <div class="form-success__glow" aria-hidden="true"></div>
+          <div class="form-success__icon-ring">
+            <i data-lucide="check" class="form-success__check-ico" aria-hidden="true"></i>
+          </div>
+          <h3 class="form-success__title">Message received</h3>
+          <p class="form-success__lead">Thank you for contacting Qimora.</p>
+          <p class="form-success__detail">
+            Please check your email — we've sent a confirmation to the address you provided.
+            Our team will review your inquiry and respond within three business hours.
+          </p>
+          <button type="button" class="form-success__again" id="cf-success-reset">Send another message</button>
+        </div>
+
+      </form>
+      </div><!-- /ctab-msg -->
+
+      <!-- ══ TAB 2 — Book Meeting ══ -->
+      <div class="ctab__panel" id="ctab-book" role="tabpanel" aria-labelledby="ctab-book-btn" hidden>
+        <form class="contact-form bk-form" id="book-form" novalidate autocomplete="off">
+
+        <div id="bk-form-panel" class="form-stack bk-form-stack">
+          <!-- Calendar -->
+          <div class="bk-cal">
+            <div class="bk-cal__header">
+              <button type="button" class="bk-cal__nav" id="bk-prev" aria-label="Previous month">
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <span class="bk-cal__month-label" id="bk-month-label"></span>
+              <button type="button" class="bk-cal__nav" id="bk-next" aria-label="Next month">
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+            <div class="bk-cal__dow-row" aria-hidden="true">
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div class="bk-cal__grid" id="bk-cal-grid" role="grid" aria-label="Meeting date picker"></div>
+            <div class="bk-cal__legend">
+              <span class="bk-cal__leg-dot bk-cal__leg-dot--booked"></span><span>Fully booked</span>
+              <span class="bk-cal__leg-dot bk-cal__leg-dot--partial"></span><span>Slots taken</span>
+              <span class="bk-cal__leg-dot bk-cal__leg-dot--selected"></span><span>Selected</span>
+              <span class="bk-cal__leg-dot bk-cal__leg-dot--today"></span><span>Today</span>
+            </div>
+          </div>
+
+          <!-- Already-booked notice -->
+          <div class="bk-booked-notice" id="bk-booked-notice" hidden>
+            <i data-lucide="calendar-x"></i>
+            <div>
+              <strong>Day fully booked</strong>
+              <span>All slots are taken on this day. Pick another date.</span>
+            </div>
+          </div>
+
+          <!-- Timezone + slots — revealed after free day chosen -->
+          <div class="bk-slots-wrap" id="bk-slots-wrap" hidden>
+            <div class="contact-form__field">
+              <label class="contact-form__label" for="bk-tz-search">
+                <i data-lucide="search" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
+                Search timezone
+              </label>
+              <div class="contact-form__input-wrap">
+                <i data-lucide="search" class="contact-form__input-icon" aria-hidden="true"></i>
+                <input class="contact-form__input" type="search" id="bk-tz-search" placeholder="City, country, or region — narrows the list below (e.g. Tokyo, Cairo, São Paulo)" autocomplete="off" aria-describedby="bk-tz-hint" />
+              </div>
+              <p class="cf-wa__hint" id="bk-tz-hint" style="margin-top:6px;">
+                Full IANA list from your browser. Search by city or region — approximate spelling is OK (e.g. “dubia” finds Dubai). Leave empty to scroll everything.
+              </p>
+            </div>
+            <div class="contact-form__field">
+              <label class="contact-form__label" for="bk-tz">
+                <i data-lucide="globe" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
+                Your timezone (IANA)
+              </label>
+              <div class="contact-form__input-wrap contact-form__input-wrap--select">
+                <i data-lucide="globe" class="contact-form__input-icon" aria-hidden="true"></i>
+                <select class="contact-form__input contact-form__select" id="bk-tz" name="timezone" aria-describedby="bk-tz-hint"></select>
+                <i data-lucide="chevron-down" class="contact-form__select-chevron" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="contact-form__field">
+              <label class="contact-form__label">
+                <i data-lucide="clock" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"></i>
+                Available Slots
+                <span class="bk-slots__tz-note" id="bk-tz-note"></span>
+              </label>
+              <div class="bk-slots__grid" id="bk-slots-grid" role="group" aria-label="Available time slots"></div>
+              <span class="contact-form__error" id="bk-slot-err" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Booking details — revealed after slot chosen -->
+          <div class="bk-details-wrap" id="bk-details-wrap" hidden>
+            <div class="bk-details__summary" id="bk-summary"></div>
+
+            <div class="contact-form__row contact-form__row--2col">
+              <div class="contact-form__field">
+                <label class="contact-form__label" for="bk-name">
+                  Full Name <span class="contact-form__required" aria-hidden="true">*</span>
+                </label>
+                <div class="contact-form__input-wrap">
+                  <i data-lucide="user" class="contact-form__input-icon" aria-hidden="true"></i>
+                  <input class="contact-form__input" type="text" id="bk-name" name="bk_name" placeholder="John Smith" required autocomplete="name" />
+                </div>
+                <span class="contact-form__error" id="bk-name-err" role="alert"></span>
+              </div>
+              <div class="contact-form__field">
+                <label class="contact-form__label" for="bk-company">
+                  Company <span class="contact-form__optional">(optional)</span>
+                </label>
+                <div class="contact-form__input-wrap">
+                  <i data-lucide="building-2" class="contact-form__input-icon" aria-hidden="true"></i>
+                  <input class="contact-form__input" type="text" id="bk-company" name="bk_company" placeholder="Your company" autocomplete="organization" />
+                </div>
+              </div>
+            </div>
+
+            <div class="contact-form__field">
+              <label class="contact-form__label" for="bk-email">
+                Email Address <span class="contact-form__required" aria-hidden="true">*</span>
+              </label>
+              <div class="contact-form__input-wrap">
+                <i data-lucide="mail" class="contact-form__input-icon" aria-hidden="true"></i>
+                <input class="contact-form__input" type="email" id="bk-email" name="bk_email" placeholder="you@company.com" required autocomplete="email" />
+              </div>
+              <span class="contact-form__error" id="bk-email-err" role="alert"></span>
+            </div>
+
+            <div class="bk-email-active-wrap" id="bk-email-active-wrap" hidden>
+              <div class="bk-email-active-card">
+                <i data-lucide="calendar-clock" class="bk-email-active-card__ico" aria-hidden="true"></i>
+                <div class="bk-email-active-card__body">
+                  <strong class="bk-email-active-card__title">You already have a meeting</strong>
+                  <p class="bk-email-active-card__desc" id="bk-email-active-desc"></p>
+                  <div class="bk-email-active-card__choice" id="bk-email-active-choice">
+                    <button type="button" class="bk-email-active-btn bk-email-active-btn--primary" id="bk-reschedule-yes">
+                      Change my time
+                    </button>
+                    <button type="button" class="bk-email-active-btn bk-email-active-btn--ghost" id="bk-reschedule-no">
+                      I’ll use another email
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <p class="bk-reschedule-banner" id="bk-reschedule-banner" hidden>
+                <i data-lucide="arrow-right-circle" aria-hidden="true"></i>
+                <span>Pick a <strong>new time</strong> in the calendar above, then tap <strong>Update appointment</strong>.</span>
+              </p>
+            </div>
+
+            <!-- WhatsApp toggle for booking -->
+            <div class="contact-form__field">
+              <div class="cf-wa__toggle-row">
+                <label class="cf-wa__toggle-label" for="bk-wa-toggle">
+                  <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+                  Available on WhatsApp?
+                </label>
+                <button type="button" class="cf-wa__toggle" id="bk-wa-toggle" role="switch" aria-checked="false" aria-label="I have WhatsApp on this number">
+                  <span class="cf-wa__toggle-knob"></span>
+                </button>
+              </div>
+              <div class="cf-wa__phone-wrap" id="bk-wa-phone-wrap" hidden>
+                <div class="contact-form__input-wrap">
+                  <i class="fa-brands fa-whatsapp contact-form__input-icon" aria-hidden="true" style="color:#25D366"></i>
+                  <input class="contact-form__input" type="tel" id="bk-wa-phone" name="bk_whatsapp" placeholder="+1 (234) 567-890" autocomplete="tel" />
+                </div>
+                <span class="cf-wa__hint">We'll send your meeting confirmation on WhatsApp.</span>
+              </div>
+            </div>
+
+            <div class="contact-form__field">
+              <label class="contact-form__label" for="bk-reason">
+                Meeting Agenda <span class="contact-form__required" aria-hidden="true">*</span>
+              </label>
+              <div class="contact-form__input-wrap contact-form__input-wrap--textarea">
+                <i data-lucide="clipboard-list" class="contact-form__input-icon contact-form__input-icon--ta" aria-hidden="true"></i>
+                <textarea class="contact-form__input contact-form__textarea" id="bk-reason" name="bk_reason" placeholder="What's this meeting about? Goals, context, key questions…" rows="3" required></textarea>
+              </div>
+              <span class="contact-form__error" id="bk-reason-err" role="alert"></span>
+            </div>
+
+            <button type="submit" class="contact-form__submit" id="bk-submit">
+              <span class="contact-form__submit-text">Confirm Booking</span>
+              <i data-lucide="calendar-check" class="contact-form__submit-icon"></i>
+              <span class="contact-form__submit-spinner" aria-hidden="true"></span>
+            </button>
+            <p class="bk-submit-block-hint" id="bk-submit-block-hint" hidden role="status" aria-live="polite"></p>
+
+            <p class="contact-form__privacy">
+              <i data-lucide="lock" aria-hidden="true"></i>
+              After you submit, we’ll email you once your time is confirmed — that message will include your Google Meet link and time details.
+            </p>
+
+            <div class="contact-form__toast contact-form__toast--error" id="bk-toast-err" role="alert" hidden>
+              <i data-lucide="alert-circle"></i>
+              <span id="bk-toast-err-msg">Booking failed. Please try again or contact us directly.</span>
+            </div>
+
+          </div><!-- /bk-details-wrap -->
+
+        </div><!-- /bk-form-panel -->
+
+        <div class="form-success form-success--booking" id="bk-success" role="status" aria-live="polite" hidden>
+          <div class="form-success__glow form-success__glow--booking" aria-hidden="true"></div>
+          <div class="form-success__icon-ring">
+            <i data-lucide="calendar-check" class="form-success__check-ico" aria-hidden="true"></i>
+          </div>
+          <h3 class="form-success__title">Request received</h3>
+          <p class="form-success__lead">We’ve saved your preferred date and time.</p>
+          <p class="form-success__detail">
+            You’ll get an email from us as soon as we confirm your meeting. That message will include a <strong>Google Meet</strong> link and the final time in your timezone.
+            If you don’t see it within a day or two, check spam or promotions — or reach out through our contact form.
+          </p>
+          <button type="button" class="form-success__again" id="bk-success-reset">Book another meeting</button>
+        </div>
+
+        </form>
+      </div><!-- /ctab-book -->
+
+    </div><!-- /contact-form-wrap -->
+
+  </div>
+</section>

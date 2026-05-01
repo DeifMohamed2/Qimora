@@ -764,6 +764,15 @@
         if (el) el.textContent = pair[1];
       });
 
+      var roleEl = card.querySelector('.team-mem__role-badge');
+      if (roleEl) {
+        var r = String(member.role || '').trim();
+        roleEl.textContent = r;
+        roleEl.classList.toggle('team-mem__role-badge--hidden', !r);
+        if (r) roleEl.removeAttribute('aria-hidden');
+        else roleEl.setAttribute('aria-hidden', 'true');
+      }
+
       var statVal = card.querySelector('.team-mem__stat-val');
       if (statVal) statVal.textContent = member.years + '+';
 
@@ -831,7 +840,7 @@
     /* ── card click → expand / deselect ── */
     allCards.forEach(function (card) {
       card.addEventListener('click', function (e) {
-        if (e.target.closest('.team-mem__social')) return;
+        if (e.target.closest('a.team-mem__social')) return;
         var g = parseInt(card.dataset.global, 10);
         if (isNaN(g)) return;
         /* Only cards on the current page are interactive */

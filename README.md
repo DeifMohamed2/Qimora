@@ -84,6 +84,10 @@ Create a `.env` file:
 NODE_ENV=development
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/qimora
+SESSION_SECRET=your-long-random-string
+# Session cookie Secure follows the request (HTTPS, or trust proxy + X-Forwarded-Proto).
+# Set TRUST_PROXY=1 when TLS terminates at a reverse proxy. Only if you need non-Secure
+# cookies even on HTTPS (rare): SESSION_COOKIE_SECURE=false
 ```
 
 ## Tech Stack

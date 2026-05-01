@@ -37,7 +37,7 @@
       <div class="admin-page-header">
         <div>
           <h1>Messages</h1>
-          <p>Contact form inquiries, grouped by <strong>received day</strong> (Cairo). Expand a card for the full message and actions.</p>
+          <p>Contact form inquiries, grouped by <strong>received day</strong> (Cairo). Use <strong>Details</strong> to read the full message. Select rows for bulk actions.</p>
         </div>
       </div>
 
@@ -81,50 +81,83 @@
           <% if (hasFilters) { %><a href="/admin/messages" class="a-btn a-btn--primary">Reset filters</a><% } %>
         </div>
       <% } else { %>
+
+        <div class="admin-msgs-bulk">
+          <div class="admin-msgs-bulk__inner">
+            <label class="admin-msgs-bulk__select-all">
+              <input type="checkbox" id="messages-select-all" aria-label="Select all messages on this page" />
+              <span>Select all</span>
+            </label>
+            <span class="admin-msgs-bulk__count" id="messages-bulk-count">0 selected</span>
+            <form id="messages-bulk-form" method="post" action="/admin/messages/bulk" class="admin-msgs-bulk__actions">
+              <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+              <button type="submit" name="bulkAction" value="read" class="a-btn a-btn--secondary a-btn--sm">Mark read</button>
+              <button type="submit" name="bulkAction" value="delete" class="a-btn a-btn--danger a-btn--sm">Delete selected</button>
+            </form>
+          </div>
+        </div>
+
         <% messageDays.forEach(function(day) { %>
           <section class="admin-day-section">
             <header class="admin-day-section__head">
               <h2 class="admin-day-section__title"><%= day.headline %></h2>
               <span class="admin-day-section__badge"><%= day.contacts.length %> <%= day.contacts.length === 1 ? 'message' : 'messages' %></span>
             </header>
-            <div class="admin-day-section__grid">
+            <div class="admin-msg-day-list" role="list">
               <% day.contacts.forEach(function(c) {
                    var subj = c.subject === 'other' && c.customSubject ? c.customSubject : (c.subject || '—');
+                   var timeStr = '';
+                   if (c.createdAt) {
+                     timeStr = new Date(c.createdAt).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
+                   }
               %>
-                <details class="admin-pro-card<%= c.read === true ? '' : ' admin-pro-card--unread' %>">
-                  <summary class="admin-pro-card__summary">
-                    <span class="admin-pro-card__summary-main">
-                      <strong class="admin-pro-card__name"><%= c.name %></strong>
-                      <span class="admin-pro-card__email">&lt;<%= c.email %>&gt;</span>
-                    </span>
-                    <span class="admin-pro-card__summary-meta">
-                      <% if (c.read !== true) { %><span class="admin-badge admin-badge--draft">Unread</span><% } %>
-                      <span class="admin-pro-card__time"><%= c.createdAt ? new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '' %></span>
-                      <span class="admin-pro-card__chev" aria-hidden="true"></span>
-                    </span>
-                  </summary>
-                  <div class="admin-pro-card__body">
-                    <div class="admin-pro-card__tags">
-                      <span class="admin-inbox-tag"><%= subj %></span>
-                      <% if (c.company) { %><span class="admin-inbox-muted"><%= c.company %></span><% } %>
-                      <% if (c.whatsappPhone) { %><span class="admin-inbox-muted">WhatsApp <%= c.whatsappPhone %></span><% } %>
+              <article class="admin-msg-slot<%= c.read === true ? '' : ' admin-msg-slot--unread' %>" role="listitem">
+                <div class="admin-msg-slot__bar">
+                  <label class="admin-msg-slot__pick" onclick="event.stopPropagation()">
+                    <input type="checkbox"
+                           name="ids"
+                           value="<%= c._id %>"
+                           class="js-msg-bulk-cb admin-msg-slot__cb"
+                           form="messages-bulk-form"
+                           aria-label="Select message from <%= c.name %>" />
+                  </label>
+                  <div class="admin-msg-slot__summary">
+                    <div class="admin-msg-slot__who">
+                      <span class="admin-msg-slot__name"><%= c.name %></span>
+                      <span class="admin-msg-slot__email">&lt;<%= c.email %>&gt;</span>
                     </div>
-                    <p class="admin-pro-card__agenda"><%= c.message %></p>
-                    <p class="admin-pro-card__metafoot">Received <%= c.createdAt ? new Date(c.createdAt).toLocaleString() : '—' %> · ID <%= c._id %></p>
-                    <div class="admin-pro-card__actions">
-                      <% if (c.read !== true) { %>
-                        <form method="post" action="/admin/messages/<%= c._id %>/read" class="admin-pro-card__form">
-                          <input type="hidden" name="returnQuery" value="<%= fqe %>" />
-                          <button type="submit" class="a-btn a-btn--secondary a-btn--sm">Mark read</button>
-                        </form>
-                      <% } %>
-                      <form method="post" action="/admin/messages/<%= c._id %>/delete" class="admin-pro-card__form" onsubmit="return confirm('Delete this message permanently?');">
-                        <input type="hidden" name="returnQuery" value="<%= fqe %>" />
-                        <button type="submit" class="a-btn a-btn--danger a-btn--sm">Delete</button>
-                      </form>
+                    <div class="admin-msg-slot__meta">
+                      <% if (c.read !== true) { %><span class="admin-badge admin-badge--draft">Unread</span><% } %>
+                      <time class="admin-msg-slot__time" datetime="<%= c.createdAt ? new Date(c.createdAt).toISOString() : '' %>"><%= timeStr %></time>
                     </div>
                   </div>
-                </details>
+                  <button type="button" class="admin-msg-slot__details-btn js-msg-details" aria-expanded="false">
+                    <span class="admin-msg-slot__details-label">Details</span>
+                    <svg class="admin-msg-slot__chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                </div>
+                <div class="admin-msg-slot__panel">
+                  <div class="admin-msg-slot__tags">
+                    <span class="admin-inbox-tag"><%= subj %></span>
+                    <% if (c.company) { %><span class="admin-inbox-muted"><%= c.company %></span><% } %>
+                    <% if (c.whatsappPhone) { %><span class="admin-inbox-muted">WhatsApp <%= c.whatsappPhone %></span><% } %>
+                  </div>
+                  <p class="admin-msg-slot__body"><%= c.message %></p>
+                  <p class="admin-msg-slot__foot">Received <%= c.createdAt ? new Date(c.createdAt).toLocaleString() : '—' %> · ID <%= c._id %></p>
+                  <div class="admin-msg-slot__actions">
+                    <% if (c.read !== true) { %>
+                      <form method="post" action="/admin/messages/<%= c._id %>/read" class="admin-pro-card__form">
+                        <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+                        <button type="submit" class="a-btn a-btn--secondary a-btn--sm">Mark read</button>
+                      </form>
+                    <% } %>
+                    <form method="post" action="/admin/messages/<%= c._id %>/delete" class="admin-pro-card__form" onsubmit="return confirm('Delete this message permanently?');">
+                      <input type="hidden" name="returnQuery" value="<%= fqe %>" />
+                      <button type="submit" class="a-btn a-btn--danger a-btn--sm">Delete</button>
+                    </form>
+                  </div>
+                </div>
+              </article>
               <% }); %>
             </div>
           </section>
@@ -134,18 +167,78 @@
   </div>
 </div>
 <script>
-  (function () {
-    var toggle = document.getElementById('sidebar-toggle');
-    var sidebar = document.getElementById('admin-sidebar');
-    if (toggle && sidebar) {
-      toggle.addEventListener('click', function () { sidebar.classList.toggle('open'); });
+(function () {
+  var toggle = document.getElementById('sidebar-toggle');
+  var sidebar = document.getElementById('admin-sidebar');
+  if (toggle && sidebar) {
+    toggle.addEventListener('click', function () { sidebar.classList.toggle('open'); });
+  }
+  function checkBreakpoint() {
+    if (toggle) toggle.style.display = window.innerWidth <= 820 ? '' : 'none';
+  }
+  checkBreakpoint();
+  window.addEventListener('resize', checkBreakpoint);
+
+  document.querySelectorAll('.js-msg-details').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var slot = btn.closest('.admin-msg-slot');
+      if (!slot) return;
+      var open = slot.classList.toggle('admin-msg-slot--open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var lbl = btn.querySelector('.admin-msg-slot__details-label');
+      if (lbl) lbl.textContent = open ? 'Hide' : 'Details';
+    });
+  });
+
+  var bulkForm = document.getElementById('messages-bulk-form');
+  var countEl = document.getElementById('messages-bulk-count');
+  var selectAll = document.getElementById('messages-select-all');
+
+  function allMsgCbs() {
+    return Array.from(document.querySelectorAll('.js-msg-bulk-cb'));
+  }
+
+  function updateMsgBulkUi() {
+    var cbs = allMsgCbs();
+    var n = cbs.filter(function (c) { return c.checked; }).length;
+    if (countEl) countEl.textContent = n === 1 ? '1 selected' : n + ' selected';
+    if (selectAll && cbs.length) {
+      selectAll.checked = n === cbs.length;
+      selectAll.indeterminate = n > 0 && n < cbs.length;
     }
-    function checkBreakpoint() {
-      if (toggle) toggle.style.display = window.innerWidth <= 820 ? '' : 'none';
-    }
-    checkBreakpoint();
-    window.addEventListener('resize', checkBreakpoint);
-  })();
+  }
+
+  document.addEventListener('change', function (e) {
+    if (e.target.classList.contains('js-msg-bulk-cb')) updateMsgBulkUi();
+  });
+
+  if (selectAll) {
+    selectAll.addEventListener('change', function () {
+      var on = selectAll.checked;
+      allMsgCbs().forEach(function (cb) { cb.checked = on; });
+      updateMsgBulkUi();
+    });
+  }
+
+  if (bulkForm) {
+    bulkForm.addEventListener('submit', function (e) {
+      var sub = e.submitter;
+      if (!sub || sub.getAttribute('name') !== 'bulkAction') return;
+      var n = allMsgCbs().filter(function (c) { return c.checked; }).length;
+      if (!n) {
+        e.preventDefault();
+        return;
+      }
+      var msgs = {
+        read: 'Mark ' + n + ' message(s) as read?',
+        delete: 'Permanently delete ' + n + ' message(s)? This cannot be undone.'
+      };
+      if (msgs[sub.value] && !confirm(msgs[sub.value])) e.preventDefault();
+    });
+  }
+
+  updateMsgBulkUi();
+})();
 </script>
 </body>
 </html>

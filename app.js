@@ -17,6 +17,14 @@ const connectDB  = require('./config/db');
 
 const app = express();
 
+/* EJS view cache: Express enables it automatically in production. With NODE_ENV=production
+ * locally, templates are cached until restart — refresh alone won’t show .ejs edits.
+ * Set VIEW_CACHE=true on deployed servers to re-enable caching for performance.
+ */
+if (!(process.env.NODE_ENV === 'production' && process.env.VIEW_CACHE === 'true')) {
+  app.disable('view cache');
+}
+
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/qimora';
 
 /* Behind reverse proxy (HTTPS) — so Secure cookies work when NODE_ENV=production */
@@ -47,10 +55,15 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ---------- Session (admin) ---------- */
-const sessionCookieSecure =
-  process.env.SESSION_COOKIE_SECURE === 'true'
-  || (process.env.NODE_ENV === 'production' && process.env.SESSION_COOKIE_SECURE !== 'false');
+/* ---------- Session (admin) ----------
+ * express-session skips Set-Cookie when cookie.secure is true but the request is
+ * not HTTPS ("not secured" branch). A boolean true on plain HTTP never sends qimora.sid,
+ * so login persists to Mongo while the browser keeps a blank session (adminId missing).
+ * After session(), we set cookie.secure from req.secure every time so new and
+ * Mongo-reloaded sessions cannot stay stuck with stale secure:true.
+ * SESSION_COOKIE_SECURE=false: always omit Secure (rare; e.g. testing over HTTPS).
+ */
+const forceInsecureSessionCookie = process.env.SESSION_COOKIE_SECURE === 'false';
 
 app.use(
   session({
@@ -60,7 +73,7 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: mongoUri }),
     cookie: {
-      secure: sessionCookieSecure,
+      secure: false,
       httpOnly: true,
       sameSite: 'lax',
       path: '/',
@@ -68,6 +81,13 @@ app.use(
     }
   })
 );
+
+app.use((req, res, next) => {
+  if (req.session && req.session.cookie) {
+    req.session.cookie.secure = forceInsecureSessionCookie ? false : Boolean(req.secure);
+  }
+  next();
+});
 
 /* ---------- Static Files ---------- */
 app.use(express.static(path.join(__dirname, 'public')));

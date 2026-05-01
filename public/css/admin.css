@@ -77,6 +77,8 @@ button, input, textarea, select {
 .admin-app {
   display: flex;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── Sidebar ────────────────────────────────────────────────── */
@@ -275,13 +277,20 @@ button, input, textarea, select {
   color: var(--a-muted);
 }
 
-/* ── Main area ──────────────────────────────────────────────── */
+/* ── Main area ────────────────────────────────────────────────
+ * Sidebar is position:fixed and does not consume flex row width, so the only
+ * flex child (.admin-main) was shrink-wrapping to its content (~narrow column).
+ * Reserve the sidebar gutter with margin-left and fill the rest explicitly.
+ */
 .admin-main {
-  flex: 1;
+  flex: 1 1 0%;
+  min-width: 0;
   margin-left: var(--a-sidebar-w);
+  width: calc(100vw - var(--a-sidebar-w));
+  max-width: calc(100vw - var(--a-sidebar-w));
   display: flex;
   flex-direction: column;
-  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* ── Top bar ────────────────────────────────────────────────── */
@@ -347,6 +356,14 @@ button, input, textarea, select {
   width: 100%;
 }
 
+/* Wider canvas for long forms (e.g. team member editor) — uses full main column */
+.admin-content.admin-content--fluid {
+  max-width: none;
+  width: 100%;
+  align-self: stretch;
+  box-sizing: border-box;
+}
+
 /* ── Flash ──────────────────────────────────────────────────── */
 .admin-flash {
   padding: 10px 14px;
@@ -402,6 +419,22 @@ button, input, textarea, select {
   margin-top: 2px;
 }
 
+.admin-page-header--team-form {
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.admin-page-header--team-form h1 {
+  margin-top: 6px;
+}
+.admin-page-header__lead {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--a-muted2);
+  margin-top: 6px;
+  max-width: 52ch;
+}
+
 /* ── Buttons ────────────────────────────────────────────────── */
 .a-btn {
   display: inline-flex;
@@ -452,6 +485,8 @@ button, input, textarea, select {
 .a-btn--danger:hover { background: rgba(247,112,112,0.18); text-decoration: none; }
 
 .a-btn--sm { padding: 5px 10px; font-size: 0.78rem; border-radius: 7px; gap: 4px; }
+
+.a-btn--lg { padding: 11px 22px; font-size: 0.92rem; border-radius: 11px; gap: 8px; }
 
 .a-btn--full { width: 100%; padding: 11px 16px; font-size: 0.95rem; border-radius: 12px; }
 
@@ -1490,7 +1525,7 @@ button, input, textarea, select {
   :root { --a-sidebar-w: 0px; }
   .admin-sidebar { transform: translateX(-240px); transition: transform 0.2s; }
   .admin-sidebar.open { transform: translateX(0); width: 240px; }
-  .admin-main { margin-left: 0; }
+  .admin-main { margin-left: 0; width: 100%; max-width: 100%; }
   .admin-topbar { padding: 0 16px; }
   .admin-content { padding: 16px; }
   .admin-stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -1804,6 +1839,228 @@ button, input, textarea, select {
   gap: 12px;
 }
 
+/* ── Messages inbox — full-width rows, bulk toolbar (see messages.ejs) ─ */
+.admin-msg-day-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-msgs-bulk {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  background: var(--a-surface2);
+  border: 1px solid var(--a-border);
+  border-radius: var(--a-radius);
+}
+.admin-msgs-bulk__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+.admin-msgs-bulk__select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--a-muted2);
+  cursor: pointer;
+  user-select: none;
+}
+.admin-msgs-bulk__select-all input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--a-blue);
+  cursor: pointer;
+}
+.admin-msgs-bulk__count {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--a-orange);
+  min-width: 7rem;
+}
+.admin-msgs-bulk__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.admin-msg-slot {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 42%), var(--a-surface);
+  border: 1px solid var(--a-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.admin-msg-slot--unread {
+  border-left: 3px solid var(--a-orange);
+}
+.admin-msg-slot--open {
+  border-color: rgba(79, 142, 247, 0.28);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.28);
+}
+.admin-msg-slot__bar {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  min-height: 56px;
+}
+.admin-msg-slot__pick {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.12);
+  border-right: 1px solid var(--a-border);
+  cursor: pointer;
+}
+.admin-msg-slot__cb {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--a-blue);
+}
+.admin-msg-slot__summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding: 10px 14px 10px 16px;
+}
+@media (max-width: 900px) {
+  .admin-msg-slot__summary {
+    flex-wrap: wrap;
+  }
+}
+.admin-msg-slot__who {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.admin-msg-slot__name {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--a-text);
+  letter-spacing: -0.02em;
+}
+.admin-msg-slot__email {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--a-muted);
+  font-weight: 500;
+  margin-top: 3px;
+  word-break: break-all;
+}
+.admin-msg-slot__meta {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px 12px;
+  flex-shrink: 0;
+}
+.admin-msg-slot__time {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--a-muted2);
+  white-space: nowrap;
+}
+.admin-msg-slot__details-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 12px 8px 0;
+  padding: 0 14px;
+  align-self: center;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--a-border2);
+  background: var(--a-surface2);
+  color: var(--a-text);
+  font-family: var(--a-font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.admin-msg-slot__details-btn:hover {
+  background: rgba(79, 142, 247, 0.12);
+  border-color: rgba(79, 142, 247, 0.35);
+  color: #fff;
+}
+.admin-msg-slot__details-btn:focus-visible {
+  outline: 2px solid var(--a-blue);
+  outline-offset: 2px;
+}
+.admin-msg-slot__chev {
+  flex-shrink: 0;
+  opacity: 0.75;
+  transition: transform 0.2s ease;
+}
+.admin-msg-slot--open .admin-msg-slot__chev {
+  transform: rotate(180deg);
+}
+.admin-msg-slot__panel {
+  display: none;
+  padding: 0 16px 16px 60px;
+  border-top: 1px solid var(--a-border);
+  background: rgba(0, 0, 0, 0.08);
+}
+.admin-msg-slot--open .admin-msg-slot__panel {
+  display: block;
+}
+.admin-msg-slot__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  padding-top: 14px;
+}
+.admin-msg-slot__body {
+  margin-top: 12px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--a-muted2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.admin-msg-slot__foot {
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: var(--a-muted);
+}
+.admin-msg-slot__actions {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+@media (max-width: 560px) {
+  .admin-msg-slot__bar {
+    flex-wrap: wrap;
+  }
+  .admin-msg-slot__summary {
+    flex: 1 1 auto;
+    padding-right: 10px;
+  }
+  .admin-msg-slot__details-btn {
+    flex: 1 1 100%;
+    margin: 0 12px 12px 12px;
+    justify-content: center;
+  }
+  .admin-msg-slot__panel {
+    padding-left: 16px;
+  }
+}
+
 /* ── Meetings: full-width rows + explicit Details toggle ───── */
 .meet-day-list {
   display: flex;
@@ -2012,4 +2269,340 @@ button, input, textarea, select {
   color: var(--a-muted);
   line-height: 1.4;
   max-width: 140px;
+}
+
+/* Team admin — theme picker */
+.admin-team-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.admin-team-form .admin-team-theme-grid {
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 12px;
+  margin-top: 0;
+}
+@media (min-width: 1100px) {
+  .admin-team-form .admin-team-theme-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+
+.admin-team-theme-option {
+  position: relative;
+}
+.admin-team-theme-option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.admin-team-theme-option__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--a-border);
+  background: var(--a-surface2);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.admin-team-theme-option input:focus-visible + .admin-team-theme-option__label {
+  outline: 2px solid var(--a-blue);
+  outline-offset: 2px;
+}
+.admin-team-theme-option input:checked + .admin-team-theme-option__label {
+  border-color: rgba(79, 142, 247, 0.55);
+  box-shadow: 0 0 0 1px rgba(79, 142, 247, 0.25);
+}
+.admin-team-theme-option__swatch {
+  width: 100%;
+  height: 36px;
+  border-radius: 6px;
+  display: block;
+}
+.admin-team-theme-option__name {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--a-muted2);
+  text-align: center;
+}
+
+/* ── Team member form (new / edit) — full width like project form ─ */
+.admin-team-form {
+  width: 100%;
+  max-width: none;
+}
+.admin-team-form__back {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--a-muted2);
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+.admin-team-form__back:hover {
+  color: var(--a-text);
+  text-decoration: none;
+}
+
+.admin-team-form__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 34%);
+  gap: 24px 32px;
+  align-items: start;
+  width: 100%;
+}
+@media (min-width: 1320px) {
+  .admin-team-form__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+    gap: 28px 40px;
+  }
+}
+@media (max-width: 960px) {
+  .admin-team-form__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-team-form__column--main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+.admin-team-form__column--aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.admin-team-form__card {
+  background: var(--a-surface);
+  border: 1px solid var(--a-border);
+  border-radius: 14px;
+  padding: 20px 22px 22px;
+}
+.admin-team-form__card--accent {
+  border-color: rgba(79, 142, 247, 0.28);
+  box-shadow: 0 0 0 1px rgba(79, 142, 247, 0.06);
+}
+
+.admin-team-form__card-title {
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--a-border);
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--a-text);
+}
+
+.admin-team-form__hint {
+  margin: -6px 0 16px;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--a-muted2);
+  font-weight: 500;
+}
+.admin-team-form__hint strong {
+  color: var(--a-text);
+  font-weight: 700;
+}
+
+.admin-team-form__grid {
+  display: grid;
+  gap: 16px 18px;
+}
+.admin-team-form__grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 600px) {
+  .admin-team-form__grid--2 {
+    grid-template-columns: 1fr;
+  }
+}
+.admin-team-form__field--span2 {
+  grid-column: 1 / -1;
+}
+
+.admin-team-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  min-width: 0;
+}
+.admin-team-form__field--flush {
+  gap: 8px;
+}
+
+.admin-team-form__label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--a-text);
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.3;
+}
+.admin-team-form__optional {
+  font-weight: 500;
+  color: var(--a-muted);
+  font-size: 0.82rem;
+}
+.admin-team-form__req {
+  margin-left: 2px;
+  color: var(--a-red);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.admin-team-form__input,
+.admin-team-form__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--a-border2);
+  background: var(--a-surface2);
+  color: var(--a-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.admin-team-form__input::placeholder,
+.admin-team-form__textarea::placeholder {
+  color: var(--a-muted);
+  opacity: 0.85;
+}
+.admin-team-form__input:hover,
+.admin-team-form__textarea:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.admin-team-form__input:focus,
+.admin-team-form__textarea:focus {
+  outline: none;
+  border-color: rgba(79, 142, 247, 0.65);
+  box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.2);
+}
+.admin-team-form__textarea {
+  resize: vertical;
+  min-height: 130px;
+  line-height: 1.5;
+}
+.admin-team-form__input--narrow {
+  max-width: 140px;
+}
+
+.admin-team-form__micro {
+  font-size: 0.78rem;
+  color: var(--a-muted);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.admin-team-form__stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-team-form__file-wrap {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+.admin-team-form__file {
+  position: absolute;
+  opacity: 0;
+  width: 0.01px;
+  height: 0.01px;
+  overflow: hidden;
+  z-index: -1;
+}
+.admin-team-form__file-ui {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--a-muted2);
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.admin-team-form__file-wrap:hover .admin-team-form__file-ui {
+  border-color: rgba(79, 142, 247, 0.45);
+  color: var(--a-text);
+  background: rgba(79, 142, 247, 0.08);
+}
+.admin-team-form__file:focus + .admin-team-form__file-ui {
+  outline: 2px solid var(--a-blue);
+  outline-offset: 2px;
+}
+.admin-team-form__file-wrap:focus-within .admin-team-form__file-ui {
+  border-color: rgba(79, 142, 247, 0.45);
+}
+
+.admin-team-form__preview {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--a-border);
+}
+.admin-team-form__preview-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--a-muted);
+  margin-bottom: 8px;
+}
+.admin-team-form__preview-img {
+  max-width: 160px;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid var(--a-border);
+  display: block;
+}
+
+.admin-team-form__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--a-text);
+  line-height: 1.35;
+}
+.admin-team-form__check input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--a-blue);
+  cursor: pointer;
+}
+
+.admin-team-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--a-border);
 }

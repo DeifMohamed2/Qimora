@@ -3,6 +3,8 @@
    ============================================================ */
 
 const Project = require('../models/Project');
+const TeamMember = require('../models/TeamMember');
+const { teamDocsToCarousel } = require('../lib/teamMemberView');
 const { resolveTechStack } = require('../lib/techStackIcons');
 const { projectToClient } = require('../lib/projectView');
 const { accentGlow, accentDim } = require('../lib/colorUtils');
@@ -11,7 +13,10 @@ const { accentGlow, accentDim } = require('../lib/colorUtils');
 // @route   GET /
 exports.getHomePage = async (req, res, next) => {
   try {
-    const docs = await Project.find({ isPublished: true }).sort({ order: 1, title: 1 }).lean();
+    const [docs, teamDocs] = await Promise.all([
+      Project.find({ isPublished: true }).sort({ order: 1, title: 1 }).lean(),
+      TeamMember.find({ isPublished: true }).sort({ order: 1, name: 1 }).lean()
+    ]);
 
     const portfolioProjects = docs.map((p, i) => {
       const accent = p.color || '#3B5BFF';
@@ -32,10 +37,13 @@ exports.getHomePage = async (req, res, next) => {
       };
     });
 
+    const teamCarouselMembers = teamDocsToCarousel(teamDocs);
+
     res.render('index', {
       title: 'Qimora — Build Once. Scale Fast.',
       layout: 'layout',
-      portfolioProjects
+      portfolioProjects,
+      teamCarouselMembers
     });
   } catch (err) {
     next(err);

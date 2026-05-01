@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/images/icon.svg" />
+  <link rel="stylesheet" href="/css/admin.css?v=team-layout" />
+</head>
+<body class="admin-body">
+<div class="admin-app">
+  <% var currentPage = 'team'; %>
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <a href="/admin/team">Team</a>
+          <span class="admin-topbar__sep">/</span>
+          <span><%= isEdit ? member.name : 'New' %></span>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content admin-content--fluid">
+      <% if (error) { %>
+        <div class="admin-error">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <%= error %>
+        </div>
+      <% } %>
+
+      <div class="admin-page-header admin-page-header--team-form">
+        <div>
+          <a href="/admin/team" class="admin-team-form__back">← Back to team</a>
+          <h1><%= isEdit ? 'Edit team member' : 'New team member' %></h1>
+          <p class="admin-page-header__lead">Set profile details, pick a card theme, then add a photo by URL or file upload.</p>
+        </div>
+      </div>
+
+      <form method="post" action="<%= isEdit ? '/admin/team/' + member._id : '/admin/team' %>" enctype="multipart/form-data" class="admin-team-form">
+
+        <div class="admin-team-form__layout">
+          <div class="admin-team-form__column admin-team-form__column--main">
+
+            <section class="admin-team-form__card" aria-labelledby="team-section-profile">
+              <h2 id="team-section-profile" class="admin-team-form__card-title">Profile</h2>
+              <div class="admin-team-form__grid admin-team-form__grid--2">
+                <label class="admin-team-form__field">
+                  <span class="admin-team-form__label">Full name <abbr class="admin-team-form__req" title="required">*</abbr></span>
+                  <input type="text" name="name" class="admin-team-form__input" required autocomplete="name" value="<%= member.name || '' %>" />
+                </label>
+                <label class="admin-team-form__field">
+                  <span class="admin-team-form__label">Role <span class="admin-team-form__optional">(optional)</span></span>
+                  <input type="text" name="role" class="admin-team-form__input" value="<%= member.role || '' %>" placeholder="e.g. Technical Lead" />
+                </label>
+                <label class="admin-team-form__field admin-team-form__field--span2">
+                  <span class="admin-team-form__label">Specialty / title line <abbr class="admin-team-form__req" title="required">*</abbr></span>
+                  <input type="text" name="specialty" class="admin-team-form__input" required value="<%= member.specialty || '' %>" placeholder="e.g. Full-Stack Architect" />
+                </label>
+                <label class="admin-team-form__field">
+                  <span class="admin-team-form__label">Years experience <abbr class="admin-team-form__req" title="required">*</abbr></span>
+                  <input type="number" name="years" class="admin-team-form__input" min="0" max="99" required value="<%= member.years != null ? member.years : 5 %>" />
+                </label>
+              </div>
+            </section>
+
+            <section class="admin-team-form__card" aria-labelledby="team-section-theme">
+              <h2 id="team-section-theme" class="admin-team-form__card-title">Card theme</h2>
+              <p class="admin-team-form__hint">Eight presets match the public site carousel. Pick the palette for this member’s card.</p>
+              <div class="admin-team-theme-grid" role="radiogroup" aria-label="Card color theme">
+                <% (teamThemes || []).forEach(function(t) { %>
+                  <div class="admin-team-theme-option">
+                    <input type="radio" name="theme" id="theme-<%= t.id %>" value="<%= t.id %>" <%= String(member.theme || 1) === String(t.id) ? 'checked' : '' %> />
+                    <label for="theme-<%= t.id %>" class="admin-team-theme-option__label">
+                      <span class="admin-team-theme-option__swatch" style="background:<%= t.bgGradient %>;border:2px solid <%= t.accent %>;"></span>
+                      <span class="admin-team-theme-option__name"><%= t.label %></span>
+                    </label>
+                  </div>
+                <% }); %>
+              </div>
+            </section>
+
+            <section class="admin-team-form__card" aria-labelledby="team-section-bio">
+              <h2 id="team-section-bio" class="admin-team-form__card-title">Bio</h2>
+              <label class="admin-team-form__field admin-team-form__field--flush">
+                <span class="admin-team-form__label">Short description <span class="admin-team-form__optional">(optional)</span></span>
+                <textarea name="description" class="admin-team-form__textarea" rows="5" placeholder="What they focus on, highlights, tone for the site…"><%= member.description || '' %></textarea>
+              </label>
+            </section>
+          </div>
+
+          <div class="admin-team-form__column admin-team-form__column--aside">
+
+            <section class="admin-team-form__card admin-team-form__card--accent" aria-labelledby="team-section-photo">
+              <h2 id="team-section-photo" class="admin-team-form__card-title">Photo <abbr class="admin-team-form__req" title="required">*</abbr></h2>
+              <p class="admin-team-form__hint">Use a public image URL, <strong>or</strong> upload a file. If both are set, the uploaded file is used.</p>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Image URL</span>
+                <input type="text" name="image" class="admin-team-form__input" value="<%= member.image || '' %>" placeholder="https://…" autocomplete="off" />
+              </label>
+              <div class="admin-team-form__field">
+                <span class="admin-team-form__label" id="photo-file-label">Upload file</span>
+                <label class="admin-team-form__file-wrap">
+                  <input type="file" name="photo" accept="image/*" class="admin-team-form__file" aria-labelledby="photo-file-label" />
+                  <span class="admin-team-form__file-ui">Choose image…</span>
+                </label>
+              </div>
+              <% if (isEdit && member.image) { %>
+                <div class="admin-team-form__preview">
+                  <span class="admin-team-form__preview-label">Current</span>
+                  <img src="<%= member.image %>" alt="" class="admin-team-form__preview-img" loading="lazy" />
+                </div>
+              <% } %>
+            </section>
+
+            <section class="admin-team-form__card" aria-labelledby="team-section-social">
+              <h2 id="team-section-social" class="admin-team-form__card-title">Social links</h2>
+              <p class="admin-team-form__hint">Optional. Only filled URLs appear on the card.</p>
+              <div class="admin-team-form__stack">
+                <label class="admin-team-form__field">
+                  <span class="admin-team-form__label">GitHub</span>
+                  <input type="url" name="socialGithub" class="admin-team-form__input" value="<%= member.socialGithub || '' %>" placeholder="https://github.com/…" />
+                </label>
+                <label class="admin-team-form__field">
+                  <span class="admin-team-form__label">LinkedIn</span>
+                  <input type="url" name="socialLinkedin" class="admin-team-form__input" value="<%= member.socialLinkedin || '' %>" placeholder="https://linkedin.com/in/…" />
+                </label>
+              </div>
+            </section>
+
+            <section class="admin-team-form__card" aria-labelledby="team-section-publish">
+              <h2 id="team-section-publish" class="admin-team-form__card-title">Publishing</h2>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Sort order</span>
+                <input type="number" name="order" class="admin-team-form__input admin-team-form__input--narrow" value="<%= member.order != null ? member.order : 0 %>" />
+                <span class="admin-team-form__micro">Lower numbers appear first in the carousel.</span>
+              </label>
+              <label class="admin-team-form__check">
+                <input type="checkbox" name="isPublished" value="true" <%= member.isPublished ? 'checked' : '' %> />
+                <span>Show on public site</span>
+              </label>
+            </section>
+          </div>
+        </div>
+
+        <div class="admin-team-form__actions">
+          <button type="submit" class="a-btn a-btn--primary a-btn--lg"><%= isEdit ? 'Save changes' : 'Create member' %></button>
+          <a href="/admin/team" class="a-btn a-btn--ghost a-btn--lg">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var t = document.getElementById('sidebar-toggle');
+  var s = document.getElementById('admin-sidebar');
+  if (t && s) t.addEventListener('click', function () { s.classList.toggle('open'); });
+  function bp() { if (t) t.style.display = window.innerWidth <= 820 ? '' : 'none'; }
+  bp();
+  window.addEventListener('resize', bp);
+
+  document.querySelectorAll('.admin-team-form__file').forEach(function (inp) {
+    var wrap = inp.closest('.admin-team-form__file-wrap');
+    if (!wrap) return;
+    var ui = wrap.querySelector('.admin-team-form__file-ui');
+    if (!ui) return;
+    inp.addEventListener('change', function () {
+      ui.textContent = inp.files && inp.files[0] ? inp.files[0].name : 'Choose image…';
+    });
+  });
+})();
+</script>
+</body>
+</html>

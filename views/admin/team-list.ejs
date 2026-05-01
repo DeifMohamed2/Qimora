@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="/images/icon.svg" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body class="admin-body">
+<div class="admin-app">
+  <% var currentPage = 'team'; %>
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <span>Team</span>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <% if (flash && flash.msg) { %>
+        <div class="admin-flash admin-flash--<%= flash.type === 'err' ? 'err' : 'ok' %>"><%= flash.msg %></div>
+      <% } %>
+
+      <div class="admin-page-header">
+        <div>
+          <h1>Meet Our Team</h1>
+          <p>Members appear on the home page carousel when published. Order controls listing and card numbers (01, 02…).</p>
+        </div>
+        <a href="/admin/team/new" class="a-btn a-btn--primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New member
+        </a>
+      </div>
+
+      <% if (!members || !members.length) { %>
+        <div class="admin-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          <h3>No team members yet</h3>
+          <p>Add your first member or run <code style="color:var(--a-orange);">npm run seed</code> to load defaults.</p>
+          <a href="/admin/team/new" class="a-btn a-btn--primary">Add member</a>
+        </div>
+      <% } else { %>
+        <div class="admin-grid">
+          <% members.forEach(function(m) { %>
+            <article class="admin-card">
+              <div class="admin-card__thumb">
+                <% if (m.image) { %>
+                  <img src="<%= m.image %>" alt="" loading="lazy" />
+                <% } else { %>
+                  <div class="admin-card__thumb-empty">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  </div>
+                <% } %>
+                <% var ti = Math.max(0, Math.min(7, (Number(m.theme) || 1) - 1)); %>
+                <div class="admin-card__accent-bar" style="background:<%= teamThemes[ti].accent %>;"></div>
+              </div>
+              <div class="admin-card__body">
+                <div class="admin-card__header">
+                  <h2 class="admin-card__title"><%= m.name %></h2>
+                  <span class="admin-badge <%= m.isPublished ? 'admin-badge--live' : 'admin-badge--draft' %>">
+                    <%= m.isPublished ? 'Live' : 'Draft' %>
+                  </span>
+                </div>
+                <div class="admin-card__meta">
+                  <span class="admin-card__color-dot" style="background:<%= teamThemes[ti].accent %>;"></span>
+                  Theme <%= m.theme || 1 %>
+                  <% if (m.specialty) { %>&ensp;·&ensp;<%= m.specialty %><% } %>
+                </div>
+                <div class="admin-card__meta" style="margin-top:2px;">
+                  Order&nbsp;<strong style="color:var(--a-text);"><%= m.order %></strong>
+                  <% if (m.role) { %>&ensp;·&ensp;<span style="color:var(--a-muted2);font-size:0.78rem;"><%= m.role %></span><% } %>
+                </div>
+                <div class="admin-card__actions">
+                  <a href="/admin/team/<%= m._id %>/edit" class="a-btn a-btn--secondary a-btn--sm">Edit</a>
+                  <form method="post" action="/admin/team/<%= m._id %>/toggle-publish">
+                    <button type="submit" class="a-btn a-btn--ghost a-btn--sm">
+                      <%= m.isPublished ? 'Unpublish' : 'Publish' %>
+                    </button>
+                  </form>
+                  <form method="post" action="/admin/team/<%= m._id %>/delete" onsubmit="return confirm('Remove this team member?');">
+                    <button type="submit" class="a-btn a-btn--danger a-btn--sm">Delete</button>
+                  </form>
+                </div>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var t = document.getElementById('sidebar-toggle');
+  var s = document.getElementById('admin-sidebar');
+  if (t && s) t.addEventListener('click', function () { s.classList.toggle('open'); });
+  function bp() { if (t) t.style.display = window.innerWidth <= 820 ? '' : 'none'; }
+  bp();
+  window.addEventListener('resize', bp);
+})();
+</script>
+</body>
+</html>
