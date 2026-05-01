@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/portal-head', { portal: 'admin' }) %>
+<body class="admin-body">
+<div class="admin-app">
+  <% var currentPage = 'clients'; %>
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <a href="/admin/clients">Clients</a>
+          <span class="admin-topbar__sep">/</span>
+          <span><%= isEdit ? 'Edit' : 'New' %></span>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content admin-content--fluid">
+      <% if (error) { %>
+        <div class="admin-error"><%= error %></div>
+      <% } %>
+
+      <div class="admin-page-header admin-page-header--client-form">
+        <div>
+          <a href="/admin/clients" class="admin-team-form__back">← Back to clients</a>
+          <h1><%= isEdit ? 'Edit client account' : 'New client account' %></h1>
+          <p class="admin-page-header__lead">Clients sign in at <code>/client/login</code> with the username and password you set here.</p>
+        </div>
+      </div>
+
+      <form method="post" action="<%= isEdit ? '/admin/clients/' + clientRecord._id : '/admin/clients' %>" class="admin-team-form">
+        <section class="admin-team-form__card">
+          <h2 class="admin-team-form__card-title">Account</h2>
+          <div class="admin-team-form__grid admin-team-form__grid--2">
+            <label class="admin-team-form__field">
+              <span class="admin-team-form__label">Username <abbr class="admin-team-form__req">*</abbr></span>
+              <input type="text" name="username" class="admin-team-form__input" required autocomplete="off" value="<%= clientRecord.username || '' %>" />
+            </label>
+            <label class="admin-team-form__field">
+              <span class="admin-team-form__label">Password <%= isEdit ? '(leave blank to keep)' : '*' %></span>
+              <input type="password" name="password" class="admin-team-form__input" <%= isEdit ? '' : 'required' %> autocomplete="new-password" />
+            </label>
+          </div>
+        </section>
+
+        <section class="admin-team-form__card">
+          <h2 class="admin-team-form__card-title">Profile</h2>
+          <div class="admin-team-form__grid admin-team-form__grid--2">
+            <label class="admin-team-form__field admin-team-form__field--span2">
+              <span class="admin-team-form__label">Display name</span>
+              <input type="text" name="name" class="admin-team-form__input" value="<%= clientRecord.name || '' %>" placeholder="Shown in client sidebar" />
+            </label>
+            <label class="admin-team-form__field">
+              <span class="admin-team-form__label">Email</span>
+              <input type="email" name="email" class="admin-team-form__input" value="<%= clientRecord.email || '' %>" />
+            </label>
+            <label class="admin-team-form__field">
+              <span class="admin-team-form__label">Company</span>
+              <input type="text" name="company" class="admin-team-form__input" value="<%= clientRecord.company || '' %>" />
+            </label>
+          </div>
+        </section>
+
+        <section class="admin-team-form__card admin-team-form__card--accent">
+          <h2 class="admin-team-form__card-title">Active time (client dashboard)</h2>
+          <p class="admin-team-form__hint">
+            <strong>What this sets:</strong> The date labeled “Active since” on the client dashboard, and the start of the live <strong>System live · Uptime</strong> counter at <code>/client</code>. This field is the only place in admin where that start date is configured.
+          </p>
+          <ol class="admin-team-form__steps">
+            <li>Pick the calendar day when the project went live, or when you want uptime to start counting.</li>
+            <li>Scroll down and click <strong>Save changes</strong> (or <strong>Create client</strong> for a new account).</li>
+          </ol>
+          <p class="admin-team-form__hint admin-team-form__hint--tight">
+            <strong>If you leave the date empty:</strong> the portal uses their <em>earliest recorded payment</em> as the start date when one exists. To remove a date you added earlier, clear this field and save again.
+          </p>
+          <div class="admin-team-form__grid admin-team-form__grid--2">
+            <label class="admin-team-form__field admin-team-form__field--span2">
+              <span class="admin-team-form__label">Start date for active time <span class="admin-team-form__optional">optional</span></span>
+              <% var _activeSinceStr = '';
+                 if (typeof clientRecord.activeSinceDateStr === 'string' && clientRecord.activeSinceDateStr) {
+                   _activeSinceStr = clientRecord.activeSinceDateStr;
+                 } else if (clientRecord.activeSince) {
+                   var _ad = new Date(clientRecord.activeSince);
+                   _activeSinceStr = _ad.getUTCFullYear() + '-' + String(_ad.getUTCMonth() + 1).padStart(2, '0') + '-' + String(_ad.getUTCDate()).padStart(2, '0');
+                 }
+              %>
+              <input
+                type="date"
+                name="activeSince"
+                class="admin-team-form__input admin-team-form__input--narrow"
+                value="<%= _activeSinceStr %>"
+                aria-describedby="active-since-help"
+              />
+              <span id="active-since-help" class="admin-team-form__micro">Use the date picker. Stored as midnight UTC for that calendar day; clients see it as their “active since” reference.</span>
+            </label>
+          </div>
+        </section>
+
+        <div class="admin-team-form__actions">
+          <button type="submit" class="a-btn a-btn--primary"><%= isEdit ? 'Save changes' : 'Create client' %></button>
+          <a href="/admin/clients" class="a-btn a-btn--ghost">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var t = document.getElementById('sidebar-toggle');
+  var s = document.getElementById('admin-sidebar');
+  if (t && s) t.addEventListener('click', function () { s.classList.toggle('open'); });
+  function bp() { if (t) t.style.display = window.innerWidth <= 820 ? '' : 'none'; }
+  bp();
+  window.addEventListener('resize', bp);
+})();
+</script>
+</body>
+</html>

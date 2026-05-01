@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/portal-head', { portal: 'admin' }) %>
+<body class="admin-body">
+<div class="admin-app">
+  <% var currentPage = 'clients'; %>
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <span>Clients</span>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content">
+      <%- include('partials/flash') %>
+
+      <div class="admin-page-header">
+        <div>
+          <h1>Client portal accounts</h1>
+          <p>Create logins for clients to view access data, financials, and maintenance in the light client dashboard.</p>
+        </div>
+        <a href="/admin/clients/new" class="a-btn a-btn--primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New client
+        </a>
+      </div>
+
+      <% if (!clients || !clients.length) { %>
+        <div class="admin-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <h3>No client accounts</h3>
+          <p>Add a client to issue portal credentials.</p>
+          <a href="/admin/clients/new" class="a-btn a-btn--primary">Add client</a>
+        </div>
+      <% } else { %>
+        <div class="admin-grid">
+          <% clients.forEach(function(c) { %>
+            <article class="admin-card">
+              <div class="admin-card__thumb">
+                <div class="admin-card__thumb-empty" style="display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.25rem;color:var(--a-blue);">
+                  <%= (c.name || c.username).charAt(0).toUpperCase() %>
+                </div>
+                <div class="admin-card__accent-bar" style="background:#3B5BFF;"></div>
+              </div>
+              <div class="admin-card__body">
+                <div class="admin-card__header">
+                  <h2 class="admin-card__title"><%= c.name || c.username %></h2>
+                </div>
+                <div class="admin-card__meta" style="font-size:0.8rem;">
+                  <strong><%= c.username %></strong>
+                  <% if (c.company) { %><br /><span style="color:var(--a-muted2);"><%= c.company %></span><% } %>
+                </div>
+                <div class="admin-card__actions" style="flex-wrap:wrap;">
+                  <a href="/admin/clients/<%= c._id %>/access" class="a-btn a-btn--secondary a-btn--sm">Access</a>
+                  <a href="/admin/clients/<%= c._id %>/payments" class="a-btn a-btn--secondary a-btn--sm">Payments</a>
+                  <a href="/admin/clients/<%= c._id %>/maintenance" class="a-btn a-btn--secondary a-btn--sm">Maintenance</a>
+                  <a href="/admin/clients/<%= c._id %>/edit" class="a-btn a-btn--ghost a-btn--sm">Edit</a>
+                  <form method="post" action="/admin/clients/<%= c._id %>/delete" onsubmit="return confirm('Delete this client and all related access, payments, and maintenance data?');">
+                    <button type="submit" class="a-btn a-btn--danger a-btn--sm">Delete</button>
+                  </form>
+                </div>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var t = document.getElementById('sidebar-toggle');
+  var s = document.getElementById('admin-sidebar');
+  if (t && s) t.addEventListener('click', function () { s.classList.toggle('open'); });
+  function bp() { if (t) t.style.display = window.innerWidth <= 820 ? '' : 'none'; }
+  bp();
+  window.addEventListener('resize', bp);
+})();
+</script>
+</body>
+</html>

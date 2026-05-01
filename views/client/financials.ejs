@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head') %>
+<body class="client-body">
+<div class="client-app">
+  <%- include('partials/sidebar') %>
+  <div class="client-main">
+    <header class="client-topbar">
+      <nav class="client-topbar__breadcrumb" aria-label="Section">
+        <strong>Financials</strong>
+      </nav>
+    </header>
+    <div class="client-content client-content--financials">
+      <%- include('partials/flash') %>
+
+      <header class="client-page-hero client-page-hero--card client-page-header client-page-header--financials">
+        <div class="client-page-hero__card">
+          <div class="client-page-header__text client-page-hero__main">
+            <h1 class="client-page-hero__title">Payments &amp; receipts</h1>
+            <p class="client-page-hero__lead">History by currency; filter dates to match a statement. Totals follow your range.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="client-fin-summary">
+        <div class="client-fin-pill">
+          <span class="k">Paid total (by currency)</span>
+          <% paidTotalLines.forEach(function (line) { %>
+            <div class="client-fin-pill__row">
+              <span class="client-fin-pill__ccy"><%= line.currency %></span>
+              <div class="client-fin-pill__v"><%= line.amountFmt %></div>
+            </div>
+          <% }); %>
+        </div>
+        <div class="client-fin-pill">
+          <span class="k">Pending (by currency)</span>
+          <% pendingTotalLines.forEach(function (line) { %>
+            <div class="client-fin-pill__row">
+              <span class="client-fin-pill__ccy"><%= line.currency %></span>
+              <div class="client-fin-pill__v"><%= line.amountFmt %></div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+
+      <div class="client-fin-toolbar">
+        <form method="get" action="/client/financials" class="client-fin-filter" aria-label="Filter by date">
+          <div class="client-fin-filter__fields">
+            <label class="client-fin-field">
+              <span class="client-fin-field__label">From</span>
+              <input type="date" name="from" class="client-fin-field__input" value="<%= filterFrom %>" />
+            </label>
+            <label class="client-fin-field">
+              <span class="client-fin-field__label">To</span>
+              <input type="date" name="to" class="client-fin-field__input" value="<%= filterTo %>" />
+            </label>
+          </div>
+          <div class="client-fin-filter__actions">
+            <button type="submit" class="client-fin-btn client-fin-btn--primary">Apply range</button>
+            <% if (filterActive) { %>
+              <a href="/client/financials" class="client-fin-btn client-fin-btn--ghost">Clear</a>
+            <% } %>
+          </div>
+        </form>
+        <% if (filterActive && typeof rows !== 'undefined') { %>
+          <p class="client-fin-filter__hint"><%= rows.length %> <%= rows.length === 1 ? 'payment' : 'payments' %> in this range · paid and pending totals above use the same range</p>
+        <% } %>
+      </div>
+
+      <% if (rows.length) { %>
+        <div class="client-fin-table-panel">
+          <div class="client-table-wrap client-table-wrap--financials">
+            <table class="client-table client-table--financials">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Title</th>
+                  <th scope="col">CCY</th>
+                  <th scope="col" class="client-table__num">Amount</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Receipts</th>
+                  <th scope="col" class="client-table__col-details">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% rows.forEach(function (r) { %>
+                  <% var rid = String(r._id); %>
+                  <tr class="client-fin-row">
+                    <td><time datetime="<%= new Date(r.date).toISOString() %>"><%= r.dateFmt %></time></td>
+                    <td><%= r.title || '—' %></td>
+                    <td><span class="client-fin-ccy"><%= r.currencyCode %></span></td>
+                    <td class="num"><%= r.amountFmt %></td>
+                    <td>
+                      <% if (r.status === 'pending') { %>
+                        <span class="client-badge client-badge--pending">Pending</span>
+                      <% } else { %>
+                        <span class="client-badge client-badge--paid">Paid</span>
+                      <% } %>
+                    </td>
+                    <td>
+                      <% if (r.photos && r.photos.length) { %>
+                        <div class="client-photo-links">
+                          <% r.photos.forEach(function (url, i) { %>
+                            <button type="button" class="client-receipt-link js-fin-receipt-open" data-payment-id="<%= rid %>" data-index="<%= i %>">Receipt <%= i + 1 %></button>
+                          <% }); %>
+                        </div>
+                      <% } else { %>
+                        <span class="client-fin-dash">—</span>
+                      <% } %>
+                    </td>
+                    <td class="client-fin-toggle-cell">
+                      <% if (r.hasDetails) { %>
+                        <button type="button" class="client-fin-expand" aria-expanded="false" aria-controls="fin-detail-<%= rid %>" id="fin-toggle-<%= rid %>" title="Show or hide payment details">
+                          <span class="client-fin-expand__text">Details</span>
+                          <svg class="client-fin-expand__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                      <% } %>
+                    </td>
+                  </tr>
+                  <% if (r.hasDetails) { %>
+                    <tr class="client-fin-detail-row" id="fin-detail-<%= rid %>" hidden>
+                      <td colspan="7">
+                        <div class="client-fin-detail">
+                          <div class="client-fin-detail__label">Details</div>
+                          <div class="client-fin-detail__text"><%= r.detailText %></div>
+                        </div>
+                      </td>
+                    </tr>
+                  <% } %>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% } else if (typeof hasPaymentsOverall !== 'undefined' && hasPaymentsOverall && filterActive) { %>
+        <div class="client-panel client-fin-empty-filter">
+          <p class="client-card__empty"><strong>No payments</strong> fall in this date range. Try different dates or <a href="/client/financials">clear the filter</a>.</p>
+        </div>
+      <% } else { %>
+        <div class="client-panel"><div class="client-card client-card--flush"><p class="client-card__empty">No financial records yet.</p></div></div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<div id="fin-receipt-lightbox" class="client-receipt-lightbox" role="dialog" aria-modal="true" aria-label="Receipt preview" hidden>
+  <button type="button" class="client-receipt-lightbox__close" id="fin-receipt-close" aria-label="Close">&times;</button>
+  <button type="button" class="client-receipt-lightbox__nav client-receipt-lightbox__nav--prev" id="fin-receipt-prev" aria-label="Previous receipt" hidden>&#8249;</button>
+  <button type="button" class="client-receipt-lightbox__nav client-receipt-lightbox__nav--next" id="fin-receipt-next" aria-label="Next receipt" hidden>&#8250;</button>
+  <div class="client-receipt-lightbox__scroller" id="fin-receipt-scroller"></div>
+</div>
+
+<script type="application/json" id="fin-receipts-blob"><%- JSON.stringify(
+  typeof rows !== 'undefined' && rows && rows.length
+    ? rows.map(function (r) { return { id: String(r._id), photos: r.photos || [] }; })
+    : []
+) %></script>
+
+<script>
+(function () {
+  document.querySelectorAll('.client-fin-expand').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('aria-controls');
+      var row = id && document.getElementById(id);
+      if (!row) return;
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      row.hidden = open;
+      btn.closest('.client-fin-row').classList.toggle('client-fin-row--open', !open);
+      btn.classList.toggle('is-open', !open);
+    });
+  });
+})();
+
+(function () {
+  var blobEl = document.getElementById('fin-receipts-blob');
+  var lb = document.getElementById('fin-receipt-lightbox');
+  var scroller = document.getElementById('fin-receipt-scroller');
+  var btnClose = document.getElementById('fin-receipt-close');
+  var btnPrev = document.getElementById('fin-receipt-prev');
+  var btnNext = document.getElementById('fin-receipt-next');
+  if (!blobEl || !lb || !scroller) return;
+
+  var byPayment = {};
+  try {
+    JSON.parse(blobEl.textContent || '[]').forEach(function (row) {
+      byPayment[row.id] = row.photos || [];
+    });
+  } catch (e) {}
+
+  function slideWidth() {
+    return scroller.clientWidth || window.innerWidth;
+  }
+
+  function goIndex(i) {
+    var w = slideWidth();
+    if (!w) return;
+    scroller.scrollTo({ left: i * w, behavior: 'smooth' });
+  }
+
+  function syncNav() {
+    var urls = scroller.querySelectorAll('.client-receipt-lightbox__pane');
+    var n = urls.length;
+    var w = slideWidth();
+    if (!w) return;
+    var idx = Math.round(scroller.scrollLeft / w);
+    if (n <= 1) {
+      btnPrev.hidden = true;
+      btnNext.hidden = true;
+    } else {
+      btnPrev.hidden = false;
+      btnNext.hidden = false;
+      btnPrev.disabled = idx <= 0;
+      btnNext.disabled = idx >= n - 1;
+    }
+  }
+
+  function openLightbox(paymentId, startIndex) {
+    var urls = byPayment[paymentId] || [];
+    if (!urls.length) return;
+    startIndex = Math.max(0, Math.min(startIndex || 0, urls.length - 1));
+
+    scroller.innerHTML = '';
+    urls.forEach(function (url) {
+      var pane = document.createElement('div');
+      pane.className = 'client-receipt-lightbox__pane';
+      var img = document.createElement('img');
+      img.src = url;
+      img.alt = '';
+      img.loading = 'eager';
+      pane.appendChild(img);
+      scroller.appendChild(pane);
+    });
+
+    lb.classList.toggle('client-receipt-lightbox--single', urls.length === 1);
+
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        var w = slideWidth();
+        scroller.scrollLeft = startIndex * (w || 0);
+        syncNav();
+      });
+    });
+  }
+
+  function closeLightbox() {
+    lb.hidden = true;
+    lb.classList.remove('client-receipt-lightbox--single');
+    scroller.innerHTML = '';
+    document.body.style.overflow = '';
+    btnPrev.hidden = true;
+    btnNext.hidden = true;
+  }
+
+  document.querySelectorAll('.js-fin-receipt-open').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openLightbox(btn.getAttribute('data-payment-id'), parseInt(btn.getAttribute('data-index'), 10) || 0);
+    });
+  });
+
+  if (btnClose) btnClose.addEventListener('click', closeLightbox);
+  if (btnPrev) {
+    btnPrev.addEventListener('click', function () {
+      var w = slideWidth();
+      if (!w) return;
+      var idx = Math.round(scroller.scrollLeft / w);
+      if (idx > 0) goIndex(idx - 1);
+    });
+  }
+  if (btnNext) {
+    btnNext.addEventListener('click', function () {
+      var w = slideWidth();
+      if (!w) return;
+      var n = scroller.querySelectorAll('.client-receipt-lightbox__pane').length;
+      var idx = Math.round(scroller.scrollLeft / w);
+      if (idx < n - 1) goIndex(idx + 1);
+    });
+  }
+
+  var scrollT;
+  scroller.addEventListener('scroll', function () {
+    clearTimeout(scrollT);
+    scrollT = setTimeout(syncNav, 80);
+  }, { passive: true });
+
+  window.addEventListener('resize', function () {
+    if (lb.hidden) return;
+    var panes = scroller.querySelectorAll('.client-receipt-lightbox__pane');
+    if (!panes.length) return;
+    var w = slideWidth();
+    if (!w) return;
+    var idx = Math.min(
+      panes.length - 1,
+      Math.max(0, Math.round(scroller.scrollLeft / w))
+    );
+    scroller.scrollLeft = idx * w;
+    syncNav();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (lb.hidden) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft' && btnPrev && !btnPrev.disabled && !btnPrev.hidden) btnPrev.click();
+    if (e.key === 'ArrowRight' && btnNext && !btnNext.disabled && !btnNext.hidden) btnNext.click();
+  });
+})();
+</script>
+</body>
+</html>

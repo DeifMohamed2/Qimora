@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/portal-head', { portal: 'admin' }) %>
+<body class="admin-body">
+<% function isoMonth(d) { try { return new Date(d).toISOString().slice(0, 7); } catch (e) { return ''; } } %>
+<div class="admin-app">
+  <% var currentPage = 'clients'; %>
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <a href="/admin/clients">Clients</a>
+          <span class="admin-topbar__sep">/</span>
+          <span>Maintenance — <%= clientRecord.username %></span>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content admin-content--fluid">
+      <%- include('partials/flash') %>
+
+      <div class="admin-page-header">
+        <div>
+          <a href="/admin/clients" class="admin-team-form__back">← Clients</a>
+          <h1>Maintenance &amp; updates</h1>
+          <p class="admin-page-header__lead">One record per month (or period). Level 1 = light, 4 = major release.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="/admin/clients/<%= clientRecord._id %>/access" class="a-btn a-btn--secondary a-btn--sm">Access</a>
+          <a href="/admin/clients/<%= clientRecord._id %>/payments" class="a-btn a-btn--secondary a-btn--sm">Payments</a>
+        </div>
+      </div>
+
+      <section class="admin-team-form__card" style="margin-bottom:28px;">
+        <h2 class="admin-team-form__card-title">New maintenance period</h2>
+        <form method="post" action="/admin/clients/<%= clientRecord._id %>/maintenance" class="admin-team-form__grid admin-team-form__grid--2">
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Month / year</span>
+            <input type="month" name="monthYear" class="admin-team-form__input" value="<%= isoMonth(new Date()) %>" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Level (1–4)</span>
+            <select name="level" class="admin-team-form__input">
+              <% for (var L = 1; L <= 4; L++) { %>
+                <option value="<%= L %>"><%= L %></option>
+              <% } %>
+            </select>
+          </label>
+          <label class="admin-team-form__field admin-team-form__field--span2">
+            <span class="admin-team-form__label">Title *</span>
+            <input type="text" name="title" class="admin-team-form__input" required placeholder="e.g. March security patches" />
+          </label>
+          <label class="admin-team-form__field admin-team-form__field--span2">
+            <span class="admin-team-form__label">Summary (card preview)</span>
+            <textarea name="summary" class="admin-team-form__textarea" rows="2"></textarea>
+          </label>
+          <label class="admin-team-form__field admin-team-form__field--span2">
+            <span class="admin-team-form__label">Full details (modal)</span>
+            <textarea name="details" class="admin-team-form__textarea" rows="5" placeholder="Everything done this month…"></textarea>
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Cost</span>
+            <input type="number" step="0.01" name="cost" class="admin-team-form__input" value="0" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Currency</span>
+            <select name="currency" class="admin-team-form__input">
+              <option value="USD" selected>USD</option>
+              <option value="EGP">EGP</option>
+            </select>
+          </label>
+          <div class="admin-team-form__field admin-team-form__field--span2">
+            <button type="submit" class="a-btn a-btn--primary">Add log</button>
+          </div>
+        </form>
+        <p class="admin-team-form__hint" style="margin-top:10px;">Use the month picker — we split it into month + year on save.</p>
+      </section>
+
+      <% if (!logs || !logs.length) { %>
+        <p style="color:var(--a-muted);">No maintenance logs yet.</p>
+      <% } else { %>
+        <% logs.forEach(function(log) { %>
+          <section class="admin-team-form__card" style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+              <h2 class="admin-team-form__card-title" style="margin:0;"><%= log.title %></h2>
+              <form method="post" action="/admin/clients/<%= clientRecord._id %>/maintenance/<%= log._id %>/delete" onsubmit="return confirm('Delete this log?');">
+                <button type="submit" class="a-btn a-btn--danger a-btn--sm">Delete</button>
+              </form>
+            </div>
+            <form method="post" action="/admin/clients/<%= clientRecord._id %>/maintenance/<%= log._id %>" class="admin-team-form__grid admin-team-form__grid--2">
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Month</span>
+                <input type="number" min="1" max="12" name="month" class="admin-team-form__input" required value="<%= log.month %>" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Year</span>
+                <input type="number" min="2000" max="2100" name="year" class="admin-team-form__input" required value="<%= log.year %>" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Level</span>
+                <select name="level" class="admin-team-form__input">
+                  <% for (var L = 1; L <= 4; L++) { %>
+                    <option value="<%= L %>" <%= log.level === L ? 'selected' : '' %>><%= L %></option>
+                  <% } %>
+                </select>
+              </label>
+              <label class="admin-team-form__field admin-team-form__field--span2">
+                <span class="admin-team-form__label">Title</span>
+                <input type="text" name="title" class="admin-team-form__input" required value="<%= log.title %>" />
+              </label>
+              <label class="admin-team-form__field admin-team-form__field--span2">
+                <span class="admin-team-form__label">Summary</span>
+                <textarea name="summary" class="admin-team-form__textarea" rows="2"><%= log.summary || '' %></textarea>
+              </label>
+              <label class="admin-team-form__field admin-team-form__field--span2">
+                <span class="admin-team-form__label">Details</span>
+                <textarea name="details" class="admin-team-form__textarea" rows="5"><%= log.details || '' %></textarea>
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Cost</span>
+                <input type="number" step="0.01" name="cost" class="admin-team-form__input" value="<%= log.cost %>" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Currency</span>
+                <select name="currency" class="admin-team-form__input">
+                  <option value="USD" <%= String(log.currency || 'USD').toUpperCase() !== 'EGP' ? 'selected' : '' %>>USD</option>
+                  <option value="EGP" <%= String(log.currency || '').toUpperCase() === 'EGP' ? 'selected' : '' %>>EGP</option>
+                </select>
+              </label>
+              <div class="admin-team-form__field admin-team-form__field--span2">
+                <button type="submit" class="a-btn a-btn--primary">Save log</button>
+              </div>
+            </form>
+          </section>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var t = document.getElementById('sidebar-toggle');
+  var s = document.getElementById('admin-sidebar');
+  if (t && s) t.addEventListener('click', function () { s.classList.toggle('open'); });
+  function bp() { if (t) t.style.display = window.innerWidth <= 820 ? '' : 'none'; }
+  bp();
+  window.addEventListener('resize', bp);
+})();
+</script>
+</body>
+</html>

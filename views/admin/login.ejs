@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><%= title %></title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="/images/icon.svg" />
-  <link rel="stylesheet" href="/css/admin.css" />
-</head>
+<%- include('../partials/portal-head', { portal: 'admin' }) %>
 <body class="admin-body">
   <div class="admin-login-wrap">
     <div class="admin-login-card">
@@ -22,9 +13,12 @@
       <p class="admin-login-card__subtitle">Enter your credentials to access the dashboard.</p>
 
       <% if (error) { %>
-        <div class="admin-error" role="alert" style="display:flex;align-items:center;gap:8px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <%= error %>
+        <div class="admin-error flash-dismissible" role="alert" data-autoclose-ms="6000">
+          <div class="admin-error__row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span><%= error %></span>
+          </div>
+          <button type="button" class="admin-flash__close" data-flash-close aria-label="Dismiss">&times;</button>
         </div>
       <% } %>
 

@@ -12,6 +12,13 @@ const Project = require('../models/Project');
 const Contact = require('../models/Contact');
 const MeetingBooking = require('../models/MeetingBooking');
 const TeamMember = require('../models/TeamMember');
+const Client = require('../models/Client');
+const AccessEntry = require('../models/AccessEntry');
+const Payment = require('../models/Payment');
+const { normalizePaymentCurrency } = require('../lib/paymentCurrency');
+const { paymentLineTitle } = require('../lib/paymentLineTitle');
+const { takeFlash } = require('../lib/flash');
+const MaintenanceLog = require('../models/MaintenanceLog');
 const { TEAM_THEME_PRESETS, THEME_COUNT } = require('../lib/teamThemes');
 const { clampTheme, normalizeSocialUrl } = require('../lib/teamMemberView');
 const { formatInZone, CAIRO_ZONE } = require('../lib/bookingAvailability');
@@ -29,6 +36,8 @@ const {
 const adminFormOptions = require('../lib/adminFormOptions');
 const { TECHNOLOGY_OPTIONS } = require('../lib/technologyOptions');
 
+const ACCESS_CATEGORIES = AccessEntry.ACCESS_CATEGORIES;
+
 function projectFormViewData(locals) {
   return {
     projectCategories: adminFormOptions.PROJECT_CATEGORIES,
@@ -42,18 +51,19 @@ function projectFormViewData(locals) {
 
 async function getInboxNavCounts() {
   try {
-    const [unreadMessageCount, upcomingMeetingCount, teamMemberCount] = await Promise.all([
+    const [unreadMessageCount, upcomingMeetingCount, teamMemberCount, clientCount] = await Promise.all([
       Contact.countDocuments({ read: { $ne: true } }),
       MeetingBooking.countDocuments({
         startsAt: { $gte: new Date() },
         status: { $in: ['pending', 'confirmed'] }
       }),
-      TeamMember.countDocuments()
+      TeamMember.countDocuments(),
+      Client.countDocuments()
     ]);
-    return { unreadMessageCount, upcomingMeetingCount, teamMemberCount };
+    return { unreadMessageCount, upcomingMeetingCount, teamMemberCount, clientCount };
   } catch (err) {
     console.error('Nav counts:', err.message);
-    return { unreadMessageCount: 0, upcomingMeetingCount: 0, teamMemberCount: 0 };
+    return { unreadMessageCount: 0, upcomingMeetingCount: 0, teamMemberCount: 0, clientCount: 0 };
   }
 }
 
@@ -284,6 +294,71 @@ const teamUpload = multer({
 });
 
 const teamPhotoMiddleware = teamUpload.single('photo');
+
+const PAYMENT_UPLOAD_REL = '/uploads/payments';
+const PAYMENT_UPLOAD_DIR = path.join(__dirname, '..', 'public', 'uploads', 'payments');
+
+function ensurePaymentUploadDir() {
+  try {
+    fs.mkdirSync(PAYMENT_UPLOAD_DIR, { recursive: true });
+  } catch (e) {
+    console.error('Payment upload dir:', e.message);
+  }
+}
+
+const paymentStorage = multer.diskStorage({
+  destination(_req, _file, cb) {
+    ensurePaymentUploadDir();
+    cb(null, PAYMENT_UPLOAD_DIR);
+  },
+  filename(_req, file, cb) {
+    const ext = path.extname(file.originalname || '').slice(0, 12) || '.bin';
+    const base = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `${base}${ext}`);
+  }
+});
+
+const paymentUpload = multer({
+  storage: paymentStorage,
+  limits: { fileSize: 12 * 1024 * 1024 },
+  fileFilter(_req, file, cb) {
+    const ok = /^image\//.test(file.mimetype || '');
+    if (!ok) return cb(new Error('Only image uploads are allowed'));
+    cb(null, true);
+  }
+});
+
+const paymentPhotosMiddleware = paymentUpload.array('photos', 12);
+
+function maybeUnlinkPaymentPhoto(imagePath) {
+  if (!imagePath || !String(imagePath).startsWith(PAYMENT_UPLOAD_REL)) return;
+  const rel = String(imagePath).replace(/^\/+/, '');
+  const full = path.join(__dirname, '..', 'public', rel);
+  fs.unlink(full, () => {});
+}
+
+function buildPaymentPayload(req, existingPhotos) {
+  const b = req.body;
+  const date = new Date(String(b.date || '').trim());
+  if (Number.isNaN(date.getTime())) {
+    throw new Error('Invalid payment date.');
+  }
+  let photos = Array.isArray(existingPhotos) ? [...existingPhotos] : [];
+  if (req.files && req.files.length) {
+    for (const f of req.files) {
+      photos.push(`${PAYMENT_UPLOAD_REL}/${f.filename}`);
+    }
+  }
+  return {
+    date,
+    description: String(b.description || '').trim(),
+    title: String(b.title != null && String(b.title).trim() !== '' ? b.title : b.phase || '').trim(),
+    amount: Number.parseFloat(String(b.amount)) || 0,
+    currency: normalizePaymentCurrency(b.currency),
+    status: String(b.status || 'paid') === 'pending' ? 'pending' : 'paid',
+    photos
+  };
+}
 
 function buildTeamMemberPayload(req) {
   const b = req.body;
@@ -643,6 +718,7 @@ exports.dashboard = async (req, res) => {
       labelCairo: formatInZone(m.startsAt, CAIRO_ZONE),
       labelViewer: formatInZone(m.startsAt, m.viewerTimeZone || CAIRO_ZONE)
     }));
+    const flash = takeFlash(req);
     res.render('admin/dashboard', {
       layout: false,
       title: 'Projects — Admin',
@@ -650,12 +726,11 @@ exports.dashboard = async (req, res) => {
       projectCount,
       recentMessages: recentMessagesFmt,
       upcomingMeetings: upcomingMeetingsFmt,
-      flash: req.session.flash,
+      flash,
       adminEmail: req.session.adminEmail,
       currentPage: 'projects',
       ...inboxNav
     });
-    delete req.session.flash;
   } catch (err) {
     console.error(err);
     res.status(500).send('Failed to load projects');
@@ -904,6 +979,7 @@ exports.listMessages = async (req, res) => {
       Project.countDocuments()
     ]);
     const messageDays = groupContactsByCairoDay(contacts);
+    const flash = takeFlash(req);
     res.render('admin/messages', {
       layout: false,
       title: 'Messages — Admin',
@@ -920,10 +996,9 @@ exports.listMessages = async (req, res) => {
       currentPage: 'messages',
       projectCount,
       adminEmail: req.session.adminEmail,
-      flash: req.session.flash,
+      flash,
       ...inboxNav
     });
-    delete req.session.flash;
   } catch (err) {
     console.error(err);
     res.status(500).send('Failed to load messages');
@@ -1023,6 +1098,7 @@ exports.listMeetings = async (req, res) => {
       isTerminal: m.status === 'cancelled' || m.status === 'completed'
     }));
     const meetingDays = groupMeetingsByCairoDay(meetingsFmt);
+    const flash = takeFlash(req);
     res.render('admin/meetings', {
       layout: false,
       title: 'Meetings — Admin',
@@ -1039,10 +1115,9 @@ exports.listMeetings = async (req, res) => {
       currentPage: 'meetings',
       projectCount,
       adminEmail: req.session.adminEmail,
-      flash: req.session.flash,
+      flash,
       ...inboxNav
     });
-    delete req.session.flash;
   } catch (err) {
     console.error(err);
     res.status(500).send('Failed to load meetings');
@@ -1293,17 +1368,17 @@ exports.listTeam = async (req, res) => {
       TeamMember.find().sort({ order: 1, name: 1 }).lean(),
       getInboxNavCounts()
     ]);
+    const flash = takeFlash(req);
     res.render('admin/team-list', {
       layout: false,
       title: 'Team — Admin',
       members,
       teamThemes: TEAM_THEME_PRESETS,
-      flash: req.session.flash,
+      flash,
       adminEmail: req.session.adminEmail,
       currentPage: 'team',
       ...inboxNav
     });
-    delete req.session.flash;
   } catch (err) {
     console.error(err);
     res.status(500).send('Failed to load team');
@@ -1505,6 +1580,547 @@ exports.toggleTeamPublish = async (req, res) => {
     res.redirect('/admin/team');
   }
 };
+
+// ---------- Client portal (admin) ----------
+
+exports.listClients = async (req, res) => {
+  try {
+    const clients = await Client.find().sort({ createdAt: -1 }).lean();
+    const inboxNav = await getInboxNavCounts();
+    const flash = takeFlash(req);
+    res.render('admin/clients', {
+      layout: false,
+      title: 'Clients — Admin',
+      clients,
+      flash,
+      adminEmail: req.session.adminEmail,
+      currentPage: 'clients',
+      ...inboxNav
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Failed to load clients');
+  }
+};
+
+exports.newClient = async (req, res) => {
+  const inboxNav = await getInboxNavCounts();
+  res.render('admin/client-form', {
+    layout: false,
+    title: 'New client — Admin',
+      clientRecord: { username: '', name: '', email: '', company: '', activeSinceDateStr: '' },
+    isEdit: false,
+    error: null,
+    adminEmail: req.session.adminEmail,
+    currentPage: 'clients',
+    ...inboxNav
+  });
+};
+
+exports.createClient = async (req, res) => {
+  const inboxNav = await getInboxNavCounts();
+  try {
+    const username = String(req.body.username || '')
+      .trim()
+      .toLowerCase();
+    const password = String(req.body.password || '');
+    const name = String(req.body.name || '').trim();
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const company = String(req.body.company || '').trim();
+    const activeSinceRaw = String(req.body.activeSince || '').trim();
+    let activeSince = null;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(activeSinceRaw)) {
+      activeSince = new Date(`${activeSinceRaw}T12:00:00.000Z`);
+      if (Number.isNaN(activeSince.getTime())) activeSince = null;
+    }
+    if (!username || !password) throw new Error('Username and password are required.');
+    const exists = await Client.findOne({ username });
+    if (exists) throw new Error('That username is already taken.');
+    await Client.create({
+      username,
+      passwordHash: Client.hashPassword(password),
+      name,
+      email,
+      company,
+      activeSince
+    });
+    req.session.flash = { type: 'ok', msg: 'Client account created.' };
+    res.redirect('/admin/clients');
+  } catch (err) {
+    console.error(err);
+    res.status(400).render('admin/client-form', {
+      layout: false,
+      title: 'New client — Admin',
+      clientRecord: {
+        username: String(req.body.username || '').trim().toLowerCase(),
+        name: String(req.body.name || '').trim(),
+        email: String(req.body.email || '').trim(),
+        company: String(req.body.company || '').trim(),
+        activeSinceDateStr: String(req.body.activeSince || '').trim()
+      },
+      isEdit: false,
+      error: err.message || 'Could not create client',
+      adminEmail: req.session.adminEmail,
+      currentPage: 'clients',
+      ...inboxNav
+    });
+  }
+};
+
+exports.editClient = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).send('Not found');
+    const client = await Client.findById(req.params.id).lean();
+    if (!client) return res.status(404).send('Not found');
+    const inboxNav = await getInboxNavCounts();
+    res.render('admin/client-form', {
+      layout: false,
+      title: `Edit client — ${client.username}`,
+      clientRecord: client,
+      isEdit: true,
+      error: null,
+      adminEmail: req.session.adminEmail,
+      currentPage: 'clients',
+      ...inboxNav
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error');
+  }
+};
+
+exports.updateClient = async (req, res) => {
+  const inboxNav = await getInboxNavCounts();
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).send('Not found');
+    const doc = await Client.findById(req.params.id).select('+passwordHash');
+    if (!doc) return res.status(404).send('Not found');
+    const username = String(req.body.username || '')
+      .trim()
+      .toLowerCase();
+    const password = String(req.body.password || '');
+    const name = String(req.body.name || '').trim();
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const company = String(req.body.company || '').trim();
+    const activeSinceRaw = String(req.body.activeSince || '').trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(activeSinceRaw)) {
+      const d = new Date(`${activeSinceRaw}T12:00:00.000Z`);
+      doc.activeSince = Number.isNaN(d.getTime()) ? null : d;
+    } else {
+      doc.activeSince = null;
+    }
+    if (!username) throw new Error('Username is required.');
+    const dup = await Client.findOne({ username, _id: { $ne: doc._id } });
+    if (dup) throw new Error('That username is already taken.');
+    doc.username = username;
+    doc.name = name;
+    doc.email = email;
+    doc.company = company;
+    if (password) {
+      doc.passwordHash = Client.hashPassword(password);
+    }
+    await doc.save();
+    req.session.flash = { type: 'ok', msg: 'Client updated.' };
+    res.redirect('/admin/clients');
+  } catch (err) {
+    console.error(err);
+    const client = await Client.findById(req.params.id).lean();
+    if (!client) return res.status(404).send('Not found');
+    res.status(400).render('admin/client-form', {
+      layout: false,
+      title: `Edit client — ${client.username}`,
+      clientRecord: {
+        ...client,
+        username: String(req.body.username || '').trim().toLowerCase(),
+        name: String(req.body.name || '').trim(),
+        email: String(req.body.email || '').trim(),
+        company: String(req.body.company || '').trim(),
+        activeSinceDateStr: String(req.body.activeSince || '').trim()
+      },
+      isEdit: true,
+      error: err.message || 'Could not update',
+      adminEmail: req.session.adminEmail,
+      currentPage: 'clients',
+      ...inboxNav
+    });
+  }
+};
+
+exports.deleteClient = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).send('Not found');
+    const cid = req.params.id;
+    const doc = await Client.findById(cid);
+    if (!doc) {
+      req.session.flash = { type: 'err', msg: 'Client not found.' };
+      return res.redirect('/admin/clients');
+    }
+    const payments = await Payment.find({ clientId: cid }).lean();
+    for (const p of payments) {
+      for (const ph of p.photos || []) {
+        maybeUnlinkPaymentPhoto(ph);
+      }
+    }
+    await AccessEntry.deleteMany({ clientId: cid });
+    await Payment.deleteMany({ clientId: cid });
+    await MaintenanceLog.deleteMany({ clientId: cid });
+    await Client.deleteOne({ _id: cid });
+    req.session.flash = { type: 'ok', msg: `Deleted client «${doc.username}» and related data.` };
+    res.redirect('/admin/clients');
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Delete failed.' };
+    res.redirect('/admin/clients');
+  }
+};
+
+exports.manageClientAccess = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).send('Not found');
+    const client = await Client.findById(req.params.id).lean();
+    if (!client) return res.status(404).send('Not found');
+    const entries = await AccessEntry.find({ clientId: client._id }).sort({ order: 1, label: 1 }).lean();
+    const inboxNav = await getInboxNavCounts();
+    const flash = takeFlash(req);
+    res.render('admin/client-access', {
+      layout: false,
+      title: `Access — ${client.username}`,
+      clientRecord: client,
+      entries,
+      categories: ACCESS_CATEGORIES,
+      flash,
+      adminEmail: req.session.adminEmail,
+      currentPage: 'clients',
+      ...inboxNav
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error');
+  }
+};
+
+exports.createAccessEntry = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    if (!mongoose.isValidObjectId(cid)) return res.status(404).send('Not found');
+    const client = await Client.findById(cid);
+    if (!client) return res.status(404).send('Not found');
+    const b = req.body;
+    const category = ACCESS_CATEGORIES.includes(b.category) ? b.category : 'service';
+    const label = String(b.label || '').trim();
+    if (!label) throw new Error('Label is required.');
+    await AccessEntry.create({
+      clientId: client._id,
+      category,
+      label,
+      host: String(b.host || '').trim(),
+      port: String(b.port || '').trim(),
+      username: String(b.username || '').trim(),
+      password: String(b.password || '').trim(),
+      notes: String(b.notes || '').trim(),
+      order: Number.parseInt(b.order, 10) || 0
+    });
+    req.session.flash = { type: 'ok', msg: 'Access entry added.' };
+    res.redirect(`/admin/clients/${cid}/access`);
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: err.message || 'Could not add entry.' };
+    res.redirect(`/admin/clients/${req.params.id}/access`);
+  }
+};
+
+exports.updateAccessEntry = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    const eid = req.params.entryId;
+    if (!mongoose.isValidObjectId(cid) || !mongoose.isValidObjectId(eid)) {
+      return res.status(404).send('Not found');
+    }
+    const entry = await AccessEntry.findOne({ _id: eid, clientId: cid });
+    if (!entry) return res.status(404).send('Not found');
+    const b = req.body;
+    const category = ACCESS_CATEGORIES.includes(b.category) ? b.category : entry.category;
+    entry.category = category;
+    entry.label = String(b.label || '').trim() || entry.label;
+    entry.host = String(b.host || '').trim();
+    entry.port = String(b.port || '').trim();
+    entry.username = String(b.username || '').trim();
+    entry.password = String(b.password || '').trim();
+    entry.notes = String(b.notes || '').trim();
+    entry.order = Number.parseInt(b.order, 10) || 0;
+    await entry.save();
+    req.session.flash = { type: 'ok', msg: 'Access entry saved.' };
+    res.redirect(`/admin/clients/${cid}/access`);
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Update failed.' };
+    res.redirect(`/admin/clients/${req.params.id}/access`);
+  }
+};
+
+exports.deleteAccessEntry = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    const eid = req.params.entryId;
+    if (!mongoose.isValidObjectId(cid) || !mongoose.isValidObjectId(eid)) {
+      return res.status(404).send('Not found');
+    }
+    await AccessEntry.deleteOne({ _id: eid, clientId: cid });
+    req.session.flash = { type: 'ok', msg: 'Entry removed.' };
+    res.redirect(`/admin/clients/${cid}/access`);
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Delete failed.' };
+    res.redirect(`/admin/clients/${req.params.id}/access`);
+  }
+};
+
+exports.manageClientPayments = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).send('Not found');
+    const client = await Client.findById(req.params.id).lean();
+    if (!client) return res.status(404).send('Not found');
+    const paymentsRaw = await Payment.find({ clientId: client._id }).sort({ date: -1 }).lean();
+    const payments = paymentsRaw.map((p) => ({
+      ...p,
+      lineTitle: paymentLineTitle(p)
+    }));
+    const inboxNav = await getInboxNavCounts();
+    const flash = takeFlash(req);
+    res.render('admin/client-payments', {
+      layout: false,
+      title: `Payments — ${client.username}`,
+      clientRecord: client,
+      payments,
+      flash,
+      adminEmail: req.session.adminEmail,
+      currentPage: 'clients',
+      ...inboxNav
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error');
+  }
+};
+
+exports.createPayment = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    if (!mongoose.isValidObjectId(cid)) return res.status(404).send('Not found');
+    const client = await Client.findById(cid);
+    if (!client) return res.status(404).send('Not found');
+    const payload = buildPaymentPayload(req, []);
+    await Payment.create({
+      clientId: client._id,
+      ...payload
+    });
+    req.session.flash = { type: 'ok', msg: 'Payment added.' };
+    res.redirect(`/admin/clients/${cid}/payments`);
+  } catch (err) {
+    console.error(err);
+    if (req.files && req.files.length) {
+      for (const f of req.files) fs.unlink(f.path, () => {});
+    }
+    req.session.flash = { type: 'err', msg: err.message || 'Could not add payment.' };
+    res.redirect(`/admin/clients/${req.params.id}/payments`);
+  }
+};
+
+exports.updatePayment = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    const pid = req.params.paymentId;
+    if (!mongoose.isValidObjectId(cid) || !mongoose.isValidObjectId(pid)) {
+      return res.status(404).send('Not found');
+    }
+    const doc = await Payment.findOne({ _id: pid, clientId: cid });
+    if (!doc) return res.status(404).send('Not found');
+    const payload = buildPaymentPayload(req, doc.photos || []);
+    Object.assign(doc, payload);
+    await doc.save();
+    req.session.flash = { type: 'ok', msg: 'Payment updated.' };
+    res.redirect(`/admin/clients/${cid}/payments`);
+  } catch (err) {
+    console.error(err);
+    if (req.files && req.files.length) {
+      for (const f of req.files) fs.unlink(f.path, () => {});
+    }
+    req.session.flash = { type: 'err', msg: err.message || 'Update failed.' };
+    res.redirect(`/admin/clients/${req.params.id}/payments`);
+  }
+};
+
+exports.deletePayment = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    const pid = req.params.paymentId;
+    if (!mongoose.isValidObjectId(cid) || !mongoose.isValidObjectId(pid)) {
+      return res.status(404).send('Not found');
+    }
+    const doc = await Payment.findOne({ _id: pid, clientId: cid });
+    if (!doc) {
+      req.session.flash = { type: 'err', msg: 'Not found.' };
+      return res.redirect(`/admin/clients/${cid}/payments`);
+    }
+    for (const ph of doc.photos || []) {
+      maybeUnlinkPaymentPhoto(ph);
+    }
+    await Payment.deleteOne({ _id: doc._id });
+    req.session.flash = { type: 'ok', msg: 'Payment deleted.' };
+    res.redirect(`/admin/clients/${cid}/payments`);
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Delete failed.' };
+    res.redirect(`/admin/clients/${req.params.id}/payments`);
+  }
+};
+
+exports.deletePaymentPhoto = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    const pid = req.params.paymentId;
+    const idx = Number.parseInt(String(req.body.photoIndex), 10);
+    if (!mongoose.isValidObjectId(cid) || !mongoose.isValidObjectId(pid) || Number.isNaN(idx)) {
+      return res.status(404).send('Not found');
+    }
+    const doc = await Payment.findOne({ _id: pid, clientId: cid });
+    if (!doc || !doc.photos || !doc.photos[idx]) {
+      req.session.flash = { type: 'err', msg: 'Photo not found.' };
+      return res.redirect(`/admin/clients/${cid}/payments`);
+    }
+    const removed = doc.photos.splice(idx, 1)[0];
+    maybeUnlinkPaymentPhoto(removed);
+    await doc.save();
+    req.session.flash = { type: 'ok', msg: 'Photo removed.' };
+    res.redirect(`/admin/clients/${cid}/payments`);
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Could not remove photo.' };
+    res.redirect(`/admin/clients/${req.params.id}/payments`);
+  }
+};
+
+exports.manageClientMaintenance = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).send('Not found');
+    const client = await Client.findById(req.params.id).lean();
+    if (!client) return res.status(404).send('Not found');
+    const logs = await MaintenanceLog.find({ clientId: client._id }).sort({ year: -1, month: -1 }).lean();
+    const inboxNav = await getInboxNavCounts();
+    const flash = takeFlash(req);
+    res.render('admin/client-maintenance', {
+      layout: false,
+      title: `Maintenance — ${client.username}`,
+      clientRecord: client,
+      logs,
+      flash,
+      adminEmail: req.session.adminEmail,
+      currentPage: 'clients',
+      ...inboxNav
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error');
+  }
+};
+
+exports.createMaintenanceLog = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    if (!mongoose.isValidObjectId(cid)) return res.status(404).send('Not found');
+    const client = await Client.findById(cid);
+    if (!client) return res.status(404).send('Not found');
+    const b = req.body;
+    let month;
+    let year;
+    const my = String(b.monthYear || '').trim();
+    if (/^\d{4}-\d{2}$/.test(my)) {
+      year = Number.parseInt(my.slice(0, 4), 10);
+      month = Number.parseInt(my.slice(5, 7), 10);
+    } else {
+      month = Number.parseInt(String(b.month), 10);
+      year = Number.parseInt(String(b.year), 10);
+    }
+    const level = Number.parseInt(String(b.level), 10);
+    const title = String(b.title || '').trim();
+    if (!title) throw new Error('Title is required.');
+    if (month < 1 || month > 12) throw new Error('Invalid month.');
+    if (!year || year < 2000) throw new Error('Invalid year.');
+    if (level < 1 || level > 4) throw new Error('Level must be 1–4.');
+    await MaintenanceLog.create({
+      clientId: client._id,
+      month,
+      year,
+      title,
+      level,
+      cost: Number.parseFloat(String(b.cost)) || 0,
+      currency: normalizePaymentCurrency(b.currency),
+      summary: String(b.summary || '').trim(),
+      details: String(b.details || '').trim(),
+      publishedAt: b.publishedAt ? new Date(b.publishedAt) : new Date()
+    });
+    req.session.flash = { type: 'ok', msg: 'Maintenance log added.' };
+    res.redirect(`/admin/clients/${cid}/maintenance`);
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: err.message || 'Could not add log.' };
+    res.redirect(`/admin/clients/${req.params.id}/maintenance`);
+  }
+};
+
+exports.updateMaintenanceLog = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    const lid = req.params.logId;
+    if (!mongoose.isValidObjectId(cid) || !mongoose.isValidObjectId(lid)) {
+      return res.status(404).send('Not found');
+    }
+    const doc = await MaintenanceLog.findOne({ _id: lid, clientId: cid });
+    if (!doc) return res.status(404).send('Not found');
+    const b = req.body;
+    const month = Number.parseInt(String(b.month), 10);
+    const year = Number.parseInt(String(b.year), 10);
+    const level = Number.parseInt(String(b.level), 10);
+    doc.month = month >= 1 && month <= 12 ? month : doc.month;
+    doc.year = year >= 2000 ? year : doc.year;
+    doc.title = String(b.title || '').trim() || doc.title;
+    doc.level = level >= 1 && level <= 4 ? level : doc.level;
+    doc.cost = Number.parseFloat(String(b.cost)) || 0;
+    doc.currency = normalizePaymentCurrency(b.currency);
+    doc.summary = String(b.summary || '').trim();
+    doc.details = String(b.details || '').trim();
+    if (b.publishedAt) {
+      const d = new Date(b.publishedAt);
+      if (!Number.isNaN(d.getTime())) doc.publishedAt = d;
+    }
+    await doc.save();
+    req.session.flash = { type: 'ok', msg: 'Maintenance log updated.' };
+    res.redirect(`/admin/clients/${cid}/maintenance`);
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Update failed.' };
+    res.redirect(`/admin/clients/${req.params.id}/maintenance`);
+  }
+};
+
+exports.deleteMaintenanceLog = async (req, res) => {
+  try {
+    const cid = req.params.id;
+    const lid = req.params.logId;
+    if (!mongoose.isValidObjectId(cid) || !mongoose.isValidObjectId(lid)) {
+      return res.status(404).send('Not found');
+    }
+    await MaintenanceLog.deleteOne({ _id: lid, clientId: cid });
+    req.session.flash = { type: 'ok', msg: 'Log removed.' };
+    res.redirect(`/admin/clients/${cid}/maintenance`);
+  } catch (err) {
+    console.error(err);
+    req.session.flash = { type: 'err', msg: 'Delete failed.' };
+    res.redirect(`/admin/clients/${req.params.id}/maintenance`);
+  }
+};
+
+exports.paymentPhotosMiddleware = paymentPhotosMiddleware;
 
 exports.teamPhotoMiddleware = teamPhotoMiddleware;
 

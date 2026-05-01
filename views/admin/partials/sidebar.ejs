@@ -12,6 +12,7 @@
   var msgUnread = typeof unreadMessageCount === 'number' ? unreadMessageCount : 0;
   var mtUp = typeof upcomingMeetingCount === 'number' ? upcomingMeetingCount : 0;
   var teamCt = typeof teamMemberCount === 'number' ? teamMemberCount : 0;
+  var clientPortalCt = typeof clientCount === 'number' ? clientCount : 0;
 %>
 <aside class="admin-sidebar" id="admin-sidebar" aria-label="Admin navigation">
 
@@ -31,6 +32,14 @@
       </svg>
       <span class="admin-nav-item__label">Projects</span>
       <span class="admin-nav-item__pill" aria-label="<%= pillCount %> projects"><%= pillCount %></span>
+    </a>
+
+    <a href="/admin/clients" class="admin-nav-item <%= cp === 'clients' ? 'active' : '' %>">
+      <svg class="admin-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      <span class="admin-nav-item__label">Clients</span>
+      <span class="admin-nav-item__pill" aria-label="<%= clientPortalCt %> clients"><%= clientPortalCt %></span>
     </a>
   </div>
 

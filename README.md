@@ -100,3 +100,7 @@ SESSION_SECRET=your-long-random-string
 - **Logging:** Morgan
 - **Icons:** Lucide (CDN)
 - **Font:** Manrope (Google Fonts)
+
+## Client portal
+
+Admins create accounts under **`/admin/clients`**. Clients sign in at **`/client/login`** (light dashboard with sidebar: Overview, Access data, Financials, Maintenance).

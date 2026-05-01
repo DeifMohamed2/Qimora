@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head') %>
+<body class="client-body">
+<div class="client-app">
+  <%- include('partials/sidebar') %>
+  <div class="client-main">
+    <header class="client-topbar">
+      <nav class="client-topbar__breadcrumb" aria-label="Section">
+        <strong>Access</strong>
+      </nav>
+    </header>
+    <div class="client-content client-content--access">
+      <%- include('partials/flash') %>
+
+      <% var hasAny = (groups.server && groups.server.length) || (groups.database && groups.database.length) || (groups.service && groups.service.length); %>
+      <% var blurbs = { server: 'Infrastructure hosts and shell-related endpoints.', database: 'Database hosts and connection parameters.', service: 'APIs, webhooks, and external integrations.' }; %>
+      <% var ns = (groups.server && groups.server.length) || 0; %>
+      <% var nd = (groups.database && groups.database.length) || 0; %>
+      <% var nv = (groups.service && groups.service.length) || 0; %>
+      <% var total = ns + nd + nv; %>
+
+      <header class="client-page-hero client-page-hero--card client-acc-hero">
+        <div class="client-page-hero__card<%= hasAny ? ' client-page-hero__card--split' : '' %>">
+          <div class="client-page-hero__main">
+            <h1 class="client-page-hero__title">Credentials &amp; endpoints</h1>
+            <p class="client-page-hero__lead">Copy-ready hosts and secrets—treat them like production credentials.</p>
+          </div>
+          <% if (hasAny) { %>
+            <div class="client-page-hero__aside" role="presentation">
+              <div class="client-hero-mini-grid client-hero-mini-grid--access">
+                <div class="client-hero-mini">
+                  <span class="client-hero-mini__value"><%= total %></span>
+                  <span class="client-hero-mini__label">Total</span>
+                </div>
+                <% if (ns) { %>
+                  <div class="client-hero-mini client-hero-mini--access-server">
+                    <span class="client-hero-mini__value"><%= ns %></span>
+                    <span class="client-hero-mini__label">Servers</span>
+                  </div>
+                <% } %>
+                <% if (nd) { %>
+                  <div class="client-hero-mini client-hero-mini--access-db">
+                    <span class="client-hero-mini__value"><%= nd %></span>
+                    <span class="client-hero-mini__label">DB</span>
+                  </div>
+                <% } %>
+                <% if (nv) { %>
+                  <div class="client-hero-mini client-hero-mini--access-svc">
+                    <span class="client-hero-mini__value"><%= nv %></span>
+                    <span class="client-hero-mini__label">Services</span>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </header>
+
+      <% if (hasAny) { %>
+        <nav class="client-acc-jump" aria-label="Jump to category">
+          <% if (ns) { %>
+            <a class="client-acc-jump__link" href="#acc-server">Servers</a>
+          <% } %>
+          <% if (nd) { %>
+            <a class="client-acc-jump__link" href="#acc-database">Databases</a>
+          <% } %>
+          <% if (nv) { %>
+            <a class="client-acc-jump__link" href="#acc-service">Services</a>
+          <% } %>
+        </nav>
+
+        <div class="client-acc-feed">
+          <% ['server', 'database', 'service'].forEach(function (cat) { %>
+            <% var list = groups[cat] || []; %>
+            <% if (list.length) { %>
+              <section id="acc-<%= cat %>" class="client-acc-group client-acc-group--<%= cat %>" aria-labelledby="acc-title-<%= cat %>">
+                <div class="client-acc-group__intro">
+                  <h2 class="client-acc-group__title" id="acc-title-<%= cat %>"><%= groupLabels[cat] %></h2>
+                  <p class="client-acc-group__meta"><%= blurbs[cat] %> · <span class="client-acc-group__count"><%= list.length %> <%= list.length === 1 ? 'item' : 'items' %></span></p>
+                </div>
+
+                <ul class="client-acc-stack">
+                  <% list.forEach(function (e) { %>
+                    <li class="client-acc-sheet">
+                      <div class="client-acc-sheet__head">
+                        <h3 class="client-acc-sheet__name"><%= e.label %></h3>
+                      </div>
+                      <div class="client-acc-sheet__body">
+                        <% if (e.host) { %>
+                          <div class="client-acc-field">
+                            <span class="client-acc-field__k">Host</span>
+                            <code class="client-acc-field__v"><%= e.host %></code>
+                          </div>
+                        <% } %>
+                        <% if (e.port) { %>
+                          <div class="client-acc-field">
+                            <span class="client-acc-field__k">Port</span>
+                            <code class="client-acc-field__v"><%= e.port %></code>
+                          </div>
+                        <% } %>
+                        <% if (e.username) { %>
+                          <div class="client-acc-field">
+                            <span class="client-acc-field__k">User</span>
+                            <code class="client-acc-field__v"><%= e.username %></code>
+                          </div>
+                        <% } %>
+                        <% if (e.password) { %>
+                          <div class="client-acc-field">
+                            <span class="client-acc-field__k">Password</span>
+                            <code class="client-acc-field__v"><%= e.password %></code>
+                          </div>
+                        <% } %>
+                        <% if (!e.host && !e.port && !e.username && !e.password) { %>
+                          <p class="client-acc-sheet__empty">No connection fields — see notes below if any.</p>
+                        <% } %>
+                      </div>
+                      <% if (e.notes) { %>
+                        <div class="client-acc-sheet__notes">
+                          <span class="client-acc-sheet__notes-k">Notes</span>
+                          <div class="client-acc-sheet__notes-v"><%= e.notes %></div>
+                        </div>
+                      <% } %>
+                    </li>
+                  <% }); %>
+                </ul>
+              </section>
+            <% } %>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="client-acc-empty">
+          <div class="client-acc-empty__mark" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h2 class="client-acc-empty__title">Nothing here yet</h2>
+          <p class="client-acc-empty__text">When Qimora publishes servers, databases, or services for your account in the admin area, connection details will show up in this view.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+</body>
+</html>

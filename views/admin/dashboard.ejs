@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><%= title %></title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="/images/icon.svg" />
-  <link rel="stylesheet" href="/css/admin.css" />
-</head>
+<%- include('../partials/portal-head', { portal: 'admin' }) %>
 <body class="admin-body">
 <div class="admin-app">
 
@@ -35,16 +26,7 @@
     <div class="admin-content">
 
       <!-- Flash -->
-      <% if (flash && flash.msg) { %>
-        <div class="admin-flash admin-flash--<%= flash.type === 'err' ? 'err' : 'ok' %>">
-          <% if (flash.type === 'err') { %>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <% } else { %>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          <% } %>
-          <%= flash.msg %>
-        </div>
-      <% } %>
+      <%- include('partials/flash') %>
 
       <!-- Page header -->
       <div class="admin-page-header">

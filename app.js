@@ -103,6 +103,7 @@ app.use('/', require('./routes/index'));
 app.use('/api/contact', require('./routes/api/contact'));
 app.use('/api/booking', require('./routes/api/booking'));
 app.use('/admin', require('./routes/admin'));
+app.use('/client', require('./routes/client'));
 
 /* ---------- 404 Handler ---------- */
 app.use((req, res) => {

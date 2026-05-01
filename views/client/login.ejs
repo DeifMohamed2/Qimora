@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head') %>
+<body class="client-body">
+  <div class="client-login-page">
+    <div class="client-login-card">
+      <div class="client-login-card__brand">
+        <img src="/images/qimora-logo.svg" alt="Qimora" />
+        <h1>Client portal</h1>
+        <p>Sign in with the credentials provided by Qimora.</p>
+      </div>
+
+      <%- include('partials/flash') %>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="client-error flash-dismissible" role="alert" data-autoclose-ms="6000">
+          <span class="client-error__text"><%= error %></span>
+          <button type="button" class="client-flash__close" data-flash-close aria-label="Dismiss">&times;</button>
+        </div>
+      <% } %>
+
+      <form class="client-form" method="post" action="/client/login">
+        <% if (typeof redirect !== 'undefined' && redirect) { %>
+          <input type="hidden" name="redirect" value="<%= redirect %>" />
+        <% } %>
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" required />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+
+        <button type="submit" class="client-btn client-btn--primary">Sign in</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

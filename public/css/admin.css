@@ -373,7 +373,37 @@ button, input, textarea, select {
   font-weight: 600;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.admin-flash__row {
+  display: flex;
+  align-items: center;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.admin-flash__icon {
+  flex-shrink: 0;
+}
+.admin-flash__text {
+  min-width: 0;
+}
+.admin-flash__close {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: inherit;
+  opacity: 0.75;
+  cursor: pointer;
+  font-size: 1.35rem;
+  line-height: 1;
+  padding: 2px 6px;
+  margin: -2px -4px -2px 0;
+  border-radius: 4px;
+}
+.admin-flash__close:hover {
+  opacity: 1;
 }
 .admin-flash--ok {
   background: rgba(61,214,140,0.1);
@@ -386,7 +416,18 @@ button, input, textarea, select {
   color: #fca5a5;
 }
 
+.flash-bar--hiding {
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
 .admin-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   background: rgba(247,112,112,0.1);
   border: 1px solid rgba(247,112,112,0.3);
   color: #fca5a5;
@@ -394,6 +435,13 @@ button, input, textarea, select {
   border-radius: var(--a-radius);
   margin-bottom: 16px;
   font-size: 0.875rem;
+}
+.admin-error__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
 /* ── Page header ────────────────────────────────────────────── */
@@ -1183,6 +1231,8 @@ button, input, textarea, select {
   opacity: 0;
   cursor: pointer;
   z-index: 2;
+  font-size: 0;
+  color: transparent;
 }
 
 .a-media-dropzone__inner {
@@ -2337,6 +2387,9 @@ button, input, textarea, select {
   width: 100%;
   max-width: none;
 }
+.admin-page-header--client-form .admin-page-header__lead {
+  max-width: none;
+}
 .admin-team-form__back {
   display: inline-block;
   font-size: 0.82rem;
@@ -2413,6 +2466,36 @@ button, input, textarea, select {
 .admin-team-form__hint strong {
   color: var(--a-text);
   font-weight: 700;
+}
+
+.admin-team-form__hint--tight {
+  margin: -4px 0 14px;
+}
+
+.admin-team-form__steps {
+  margin: 0 0 14px;
+  padding-left: 1.2rem;
+  max-width: 56ch;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--a-muted2);
+  font-weight: 500;
+}
+.admin-team-form__steps li {
+  margin: 0.4rem 0;
+  padding-left: 0.15rem;
+}
+.admin-team-form__steps li::marker {
+  font-weight: 700;
+  color: var(--a-text);
+}
+
+.admin-pay-photo-hint {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--a-muted2);
+  font-weight: 500;
 }
 
 .admin-team-form__grid {

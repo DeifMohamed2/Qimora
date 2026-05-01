@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/portal-head', { portal: 'admin' }) %>
+<body class="admin-body">
+<% function payDateInput(d) { try { return new Date(d).toISOString().slice(0, 10); } catch (e) { return ''; } } %>
+<div class="admin-app">
+  <% var currentPage = 'clients'; %>
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <a href="/admin/clients">Clients</a>
+          <span class="admin-topbar__sep">/</span>
+          <span>Payments — <%= clientRecord.username %></span>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content admin-content--fluid">
+      <%- include('partials/flash') %>
+
+      <div class="admin-page-header">
+        <div>
+          <a href="/admin/clients" class="admin-team-form__back">← Clients</a>
+          <h1>Payments &amp; invoices</h1>
+          <p class="admin-page-header__lead">Upload receipt images (multiple allowed). Client sees links on the financials page.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="/admin/clients/<%= clientRecord._id %>/access" class="a-btn a-btn--secondary a-btn--sm">Access</a>
+          <a href="/admin/clients/<%= clientRecord._id %>/maintenance" class="a-btn a-btn--secondary a-btn--sm">Maintenance</a>
+        </div>
+      </div>
+
+      <section class="admin-team-form__card" style="margin-bottom:28px;">
+        <h2 class="admin-team-form__card-title">New line item</h2>
+        <form method="post" action="/admin/clients/<%= clientRecord._id %>/payments" enctype="multipart/form-data" class="admin-team-form__grid admin-team-form__grid--2">
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Date *</span>
+            <input type="date" name="date" class="admin-team-form__input" required value="<%= payDateInput(new Date()) %>" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Status</span>
+            <select name="status" class="admin-team-form__input">
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+            </select>
+          </label>
+          <label class="admin-team-form__field admin-team-form__field--span2">
+            <span class="admin-team-form__label">Details <span style="font-weight:600;color:var(--a-muted);">(optional)</span></span>
+            <input type="text" name="description" class="admin-team-form__input" placeholder="Shown when client expands the row — leave blank if not needed" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Title</span>
+            <input type="text" name="title" class="admin-team-form__input" placeholder="e.g. Phase 2 — deposit" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Amount *</span>
+            <input type="number" step="0.01" name="amount" class="admin-team-form__input" required value="0" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Currency</span>
+            <select name="currency" class="admin-team-form__input">
+              <option value="USD" selected>USD</option>
+              <option value="EGP">EGP</option>
+            </select>
+          </label>
+          <div class="admin-team-form__field admin-team-form__field--span2">
+            <span class="admin-team-form__label">Receipt photos</span>
+            <p class="admin-pay-photo-hint">Drop images or browse — multiple receipts allowed (up to 12 per save). Previews appear before you submit.</p>
+            <div class="a-media-dropzone" id="paymentNewDropzone" aria-label="Upload receipt photos">
+              <div class="a-media-dropzone__hit">
+                <input type="file" id="paymentNewPhotos" name="photos" class="a-media-dropzone__file" accept="image/*" multiple />
+                <div class="a-media-dropzone__inner">
+                  <svg class="a-media-dropzone__icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span class="a-media-dropzone__title">Drop receipt images here</span>
+                  <span class="a-media-dropzone__sub">or click to browse — add several at once</span>
+                </div>
+              </div>
+              <div id="paymentNewPreviewStrip" class="a-media-strip" hidden></div>
+            </div>
+          </div>
+          <div class="admin-team-form__field admin-team-form__field--span2">
+            <button type="submit" class="a-btn a-btn--primary">Add payment</button>
+          </div>
+        </form>
+      </section>
+
+      <% if (!payments || !payments.length) { %>
+        <p style="color:var(--a-muted);">No payments yet.</p>
+      <% } else { %>
+        <% payments.forEach(function(p) { %>
+          <section class="admin-team-form__card" style="margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+              <h2 class="admin-team-form__card-title" style="margin:0;"><%= (p.lineTitle && String(p.lineTitle).trim()) ? p.lineTitle : ((p.description && String(p.description).trim()) ? p.description : 'Payment line') %></h2>
+              <form method="post" action="/admin/clients/<%= clientRecord._id %>/payments/<%= p._id %>/delete" onsubmit="return confirm('Delete this payment line?');">
+                <button type="submit" class="a-btn a-btn--danger a-btn--sm">Delete line</button>
+              </form>
+            </div>
+            <form method="post" action="/admin/clients/<%= clientRecord._id %>/payments/<%= p._id %>" enctype="multipart/form-data" class="admin-team-form__grid admin-team-form__grid--2">
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Date</span>
+                <input type="date" name="date" class="admin-team-form__input" required value="<%= payDateInput(p.date) %>" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Status</span>
+                <select name="status" class="admin-team-form__input">
+                  <option value="paid" <%= p.status === 'paid' ? 'selected' : '' %>>Paid</option>
+                  <option value="pending" <%= p.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                </select>
+              </label>
+              <label class="admin-team-form__field admin-team-form__field--span2">
+                <span class="admin-team-form__label">Details <span style="font-weight:600;color:var(--a-muted);">(optional)</span></span>
+                <input type="text" name="description" class="admin-team-form__input" value="<%= p.description || '' %>" placeholder="Optional — shown on client portal expand" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Title</span>
+                <input type="text" name="title" class="admin-team-form__input" value="<%= p.title || p.phase || '' %>" placeholder="Short label — shown on client dashboard &amp; financials" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Amount</span>
+                <input type="number" step="0.01" name="amount" class="admin-team-form__input" required value="<%= p.amount %>" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Currency</span>
+                <select name="currency" class="admin-team-form__input">
+                  <option value="USD" <%= String(p.currency || 'USD').toUpperCase() !== 'EGP' ? 'selected' : '' %>>USD</option>
+                  <option value="EGP" <%= String(p.currency || '').toUpperCase() === 'EGP' ? 'selected' : '' %>>EGP</option>
+                </select>
+              </label>
+              <div class="admin-team-form__field admin-team-form__field--span2">
+                <span class="admin-team-form__label">Add more receipt photos</span>
+                <p class="admin-pay-photo-hint">Append images to this line — same drag-and-drop flow as project media.</p>
+                <div class="a-media-dropzone" id="paymentDropzone-<%= p._id %>" aria-label="Add receipt photos">
+                  <div class="a-media-dropzone__hit">
+                    <input type="file" id="paymentPhotos-<%= p._id %>" name="photos" class="a-media-dropzone__file" accept="image/*" multiple />
+                    <div class="a-media-dropzone__inner">
+                      <svg class="a-media-dropzone__icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      <span class="a-media-dropzone__title">Drop images here</span>
+                      <span class="a-media-dropzone__sub">or browse — merged with existing receipts on save</span>
+                    </div>
+                  </div>
+                  <div id="paymentPreviewStrip-<%= p._id %>" class="a-media-strip" hidden></div>
+                </div>
+              </div>
+              <div class="admin-team-form__field admin-team-form__field--span2">
+                <button type="submit" class="a-btn a-btn--primary">Save line</button>
+              </div>
+            </form>
+            <% if (p.photos && p.photos.length) { %>
+              <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+                <% p.photos.forEach(function(url, idx) { %>
+                  <div style="text-align:center;">
+                    <a href="<%= url %>" target="_blank" rel="noopener"><img src="<%= url %>" alt="" style="max-height:80px;border-radius:8px;border:1px solid var(--a-border);" loading="lazy" /></a>
+                    <form method="post" action="/admin/clients/<%= clientRecord._id %>/payments/<%= p._id %>/photo-delete" style="margin-top:6px;">
+                      <input type="hidden" name="photoIndex" value="<%= idx %>" />
+                      <button type="submit" class="a-btn a-btn--ghost a-btn--sm">Remove</button>
+                    </form>
+                  </div>
+                <% }); %>
+              </div>
+            <% } %>
+          </section>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var t = document.getElementById('sidebar-toggle');
+  var s = document.getElementById('admin-sidebar');
+  if (t && s) t.addEventListener('click', function () { s.classList.toggle('open'); });
+  function bp() { if (t) t.style.display = window.innerWidth <= 820 ? '' : 'none'; }
+  bp();
+  window.addEventListener('resize', bp);
+
+  /* Receipt photos — same dropzone + preview pattern as project media */
+  function revokeUrlList(list) {
+    list.forEach(function (u) {
+      try { URL.revokeObjectURL(u); } catch (e) { /* ignore */ }
+    });
+    list.length = 0;
+  }
+  function mergeImageFilesIntoInput(input, newFileList) {
+    if (!input) return;
+    var dt = new DataTransfer();
+    var i;
+    if (input.files && input.files.length) {
+      for (i = 0; i < input.files.length; i++) dt.items.add(input.files[i]);
+    }
+    var arr = newFileList.length !== undefined ? Array.prototype.slice.call(newFileList) : [];
+    for (i = 0; i < arr.length; i++) {
+      if (arr[i] && /^image\//.test(arr[i].type)) dt.items.add(arr[i]);
+    }
+    input.files = dt.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function wireMediaDropzone(zoneEl, fileInput) {
+    if (!zoneEl || !fileInput) return;
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      zoneEl.addEventListener(ev, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        zoneEl.classList.add('is-dragover');
+      });
+    });
+    zoneEl.addEventListener('dragleave', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!zoneEl.contains(e.relatedTarget)) zoneEl.classList.remove('is-dragover');
+    });
+    zoneEl.addEventListener('drop', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      zoneEl.classList.remove('is-dragover');
+      var fl = e.dataTransfer && e.dataTransfer.files;
+      if (!fl || !fl.length) return;
+      mergeImageFilesIntoInput(fileInput, fl);
+    });
+  }
+  function bindPaymentPhotoDropzone(zoneId, inputId, stripId) {
+    var zone = document.getElementById(zoneId);
+    var input = document.getElementById(inputId);
+    var strip = document.getElementById(stripId);
+    if (!input || !strip) return;
+    var previewUrls = [];
+    function rebuild() {
+      revokeUrlList(previewUrls);
+      strip.innerHTML = '';
+      if (!input.files || !input.files.length) {
+        strip.hidden = true;
+        return;
+      }
+      strip.hidden = false;
+      for (var i = 0; i < input.files.length; i++) {
+        var f = input.files[i];
+        if (!/^image\//.test(f.type)) continue;
+        var u = URL.createObjectURL(f);
+        previewUrls.push(u);
+        var wrap = document.createElement('div');
+        wrap.className = 'a-media-strip__item';
+        var im = document.createElement('img');
+        im.src = u;
+        im.alt = f.name || '';
+        wrap.appendChild(im);
+        strip.appendChild(wrap);
+      }
+    }
+    input.addEventListener('change', rebuild);
+    wireMediaDropzone(zone, input);
+  }
+  bindPaymentPhotoDropzone('paymentNewDropzone', 'paymentNewPhotos', 'paymentNewPreviewStrip');
+<% if (payments && payments.length) { payments.forEach(function (p) { %>
+  bindPaymentPhotoDropzone('paymentDropzone-<%= p._id %>', 'paymentPhotos-<%= p._id %>', 'paymentPreviewStrip-<%= p._id %>');
+<% }); } %>
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<% if (typeof flash !== 'undefined' && flash && flash.msg) { %>
+  <div
+    class="client-flash client-flash--<%= flash.type === 'err' ? 'err' : 'ok' %> flash-dismissible"
+    role="status"
+    data-autoclose-ms="6000"
+  >
+    <div class="client-flash__row">
+      <span class="client-flash__text"><%= flash.msg %></span>
+    </div>
+    <button type="button" class="client-flash__close" data-flash-close aria-label="Dismiss message">&times;</button>
+  </div>
+<% } %>

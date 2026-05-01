@@ -1,0 +1,46 @@
+<%
+  var cp = typeof currentPage !== 'undefined' ? currentPage : '';
+  var cn = typeof clientName !== 'undefined' ? clientName : 'Client';
+  var initials = cn ? String(cn).charAt(0).toUpperCase() : 'C';
+%>
+<aside class="client-sidebar" aria-label="Client navigation">
+  <a href="/client" class="client-sidebar__brand">
+    <img src="/images/qimora-logo.svg" alt="Qimora" class="client-sidebar__logo" />
+    <span class="client-sidebar__badge">Portal</span>
+  </a>
+
+  <nav class="client-nav-section" aria-label="Main">
+    <span class="client-nav-section__label">Overview</span>
+    <a href="/client" class="client-nav-item <%= cp === 'dashboard' ? 'active' : '' %>">
+      <svg class="client-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      Dashboard
+    </a>
+    <a href="/client/access" class="client-nav-item <%= cp === 'access' ? 'active' : '' %>">
+      <svg class="client-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Access data
+    </a>
+    <a href="/client/financials" class="client-nav-item <%= cp === 'financials' ? 'active' : '' %>">
+      <svg class="client-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Financials
+    </a>
+    <a href="/client/maintenance" class="client-nav-item <%= cp === 'maintenance' ? 'active' : '' %>">
+      <svg class="client-nav-item__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+      Maintenance
+    </a>
+  </nav>
+
+  <div class="client-sidebar__divider"></div>
+
+  <div class="client-sidebar__user">
+    <div class="client-sidebar__avatar"><%= initials %></div>
+    <div class="client-sidebar__user-info">
+      <div class="client-sidebar__user-name"><%= cn %></div>
+      <div class="client-sidebar__user-role">Client account</div>
+    </div>
+    <form method="post" action="/client/logout" class="client-sidebar__logout-form">
+      <button type="submit" title="Log out" class="client-sidebar__logout-btn" aria-label="Log out">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </form>
+  </div>
+</aside>

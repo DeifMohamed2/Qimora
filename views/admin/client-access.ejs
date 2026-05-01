@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/portal-head', { portal: 'admin' }) %>
+<body class="admin-body">
+<div class="admin-app">
+  <% var currentPage = 'clients'; %>
+  <%- include('partials/sidebar') %>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="admin-topbar__left">
+        <button class="a-btn a-btn--ghost a-btn--sm" id="sidebar-toggle" aria-label="Toggle sidebar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <nav class="admin-topbar__breadcrumb">
+          <a href="/admin">Admin</a>
+          <span class="admin-topbar__sep">/</span>
+          <a href="/admin/clients">Clients</a>
+          <span class="admin-topbar__sep">/</span>
+          <span>Access — <%= clientRecord.username %></span>
+        </nav>
+      </div>
+    </header>
+
+    <div class="admin-content admin-content--fluid">
+      <%- include('partials/flash') %>
+
+      <div class="admin-page-header">
+        <div>
+          <a href="/admin/clients" class="admin-team-form__back">← Clients</a>
+          <h1>Access data</h1>
+          <p class="admin-page-header__lead"><%= clientRecord.name || clientRecord.username %> — servers, databases, and services.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="/admin/clients/<%= clientRecord._id %>/payments" class="a-btn a-btn--secondary a-btn--sm">Payments</a>
+          <a href="/admin/clients/<%= clientRecord._id %>/maintenance" class="a-btn a-btn--secondary a-btn--sm">Maintenance</a>
+          <a href="/admin/clients/<%= clientRecord._id %>/edit" class="a-btn a-btn--ghost a-btn--sm">Edit account</a>
+        </div>
+      </div>
+
+      <section class="admin-team-form__card" style="margin-bottom:24px;">
+        <h2 class="admin-team-form__card-title">Add entry</h2>
+        <form method="post" action="/admin/clients/<%= clientRecord._id %>/access" class="admin-team-form__grid admin-team-form__grid--2">
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Category</span>
+            <select name="category" class="admin-team-form__input">
+              <% categories.forEach(function(cat) { %>
+                <option value="<%= cat %>"><%= cat %></option>
+              <% }); %>
+            </select>
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Label *</span>
+            <input type="text" name="label" class="admin-team-form__input" required placeholder="e.g. Production VPS" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Host</span>
+            <input type="text" name="host" class="admin-team-form__input" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Port</span>
+            <input type="text" name="port" class="admin-team-form__input" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Username</span>
+            <input type="text" name="username" class="admin-team-form__input" autocomplete="off" />
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Password</span>
+            <input type="text" name="password" class="admin-team-form__input" autocomplete="off" />
+          </label>
+          <label class="admin-team-form__field admin-team-form__field--span2">
+            <span class="admin-team-form__label">Notes</span>
+            <textarea name="notes" class="admin-team-form__textarea" rows="2"></textarea>
+          </label>
+          <label class="admin-team-form__field">
+            <span class="admin-team-form__label">Sort order</span>
+            <input type="number" name="order" class="admin-team-form__input" value="0" />
+          </label>
+          <div class="admin-team-form__field" style="align-self:end;">
+            <button type="submit" class="a-btn a-btn--primary">Add entry</button>
+          </div>
+        </form>
+      </section>
+
+      <% if (!entries || !entries.length) { %>
+        <p style="color:var(--a-muted);">No entries yet.</p>
+      <% } else { %>
+        <% entries.forEach(function(e) { %>
+          <section class="admin-team-form__card" style="margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+              <h2 class="admin-team-form__card-title" style="margin:0;"><%= e.label %> <span style="font-size:0.75rem;color:var(--a-muted);font-weight:600;">(<%= e.category %>)</span></h2>
+              <form method="post" action="/admin/clients/<%= clientRecord._id %>/access/<%= e._id %>/delete" onsubmit="return confirm('Delete this entry?');">
+                <button type="submit" class="a-btn a-btn--danger a-btn--sm">Delete</button>
+              </form>
+            </div>
+            <form method="post" action="/admin/clients/<%= clientRecord._id %>/access/<%= e._id %>" class="admin-team-form__grid admin-team-form__grid--2">
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Category</span>
+                <select name="category" class="admin-team-form__input">
+                  <% categories.forEach(function(cat) { %>
+                    <option value="<%= cat %>" <%= e.category === cat ? 'selected' : '' %>><%= cat %></option>
+                  <% }); %>
+                </select>
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Label *</span>
+                <input type="text" name="label" class="admin-team-form__input" required value="<%= e.label %>" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Host</span>
+                <input type="text" name="host" class="admin-team-form__input" value="<%= e.host || '' %>" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Port</span>
+                <input type="text" name="port" class="admin-team-form__input" value="<%= e.port || '' %>" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Username</span>
+                <input type="text" name="username" class="admin-team-form__input" value="<%= e.username || '' %>" autocomplete="off" />
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Password</span>
+                <input type="text" name="password" class="admin-team-form__input" value="<%= e.password || '' %>" autocomplete="off" />
+              </label>
+              <label class="admin-team-form__field admin-team-form__field--span2">
+                <span class="admin-team-form__label">Notes</span>
+                <textarea name="notes" class="admin-team-form__textarea" rows="2"><%= e.notes || '' %></textarea>
+              </label>
+              <label class="admin-team-form__field">
+                <span class="admin-team-form__label">Sort order</span>
+                <input type="number" name="order" class="admin-team-form__input" value="<%= e.order %>" />
+              </label>
+              <div class="admin-team-form__field" style="align-self:end;">
+                <button type="submit" class="a-btn a-btn--primary">Save</button>
+              </div>
+            </form>
+          </section>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var t = document.getElementById('sidebar-toggle');
+  var s = document.getElementById('admin-sidebar');
+  if (t && s) t.addEventListener('click', function () { s.classList.toggle('open'); });
+  function bp() { if (t) t.style.display = window.innerWidth <= 820 ? '' : 'none'; }
+  bp();
+  window.addEventListener('resize', bp);
+})();
+</script>
+</body>
+</html>

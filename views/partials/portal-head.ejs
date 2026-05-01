@@ -1,0 +1,25 @@
+<% 
+  /* Shared <head> for client + admin. Pass portal: 'client' | 'admin'. Optional: title, headStylesheet, headIcon */
+  var _portal = typeof portal !== 'undefined' ? String(portal) : 'client';
+  var _isAdmin = _portal === 'admin';
+  var _sheet = (typeof headStylesheet !== 'undefined' && headStylesheet)
+    ? String(headStylesheet)
+    : (_isAdmin ? '/css/admin.css' : '/css/client.css');
+  var _icon = (typeof headIcon !== 'undefined' && headIcon)
+    ? String(headIcon)
+    : (_isAdmin ? '/images/icon.svg' : '/images/qimora-icon.svg');
+  var _defaultTitle = _isAdmin ? 'Admin — Qimora' : 'Client portal — Qimora';
+  var _pageTitle = (typeof title !== 'undefined' && title) ? title : _defaultTitle;
+%>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title><%= _pageTitle %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="<%= _icon %>" />
+  <link rel="stylesheet" href="<%= _sheet %>" />
+  <script src="/js/flash-dismiss.js" defer></script>
+</head>
