@@ -8,7 +8,9 @@ This app can (1) email guests when they book and when an admin confirms, and (2)
 
 | Variable | Purpose |
 |----------|---------|
-| `PUBLIC_SITE_URL` | Public site base URL **without** trailing slash (e.g. `https://qimora.com`). Used for the **Qimora logo** in HTML emails (`/images/qimora.png`). |
+| `PUBLIC_SITE_URL` | Public site base URL **without** trailing slash (e.g. `https://qimora.com`). Used for **links**, **fallback logo URL**, and **Message-ID domain** when not overridden. |
+| `MAIL_REPLY_TO` | Optional. Reply-To address for outbound mail (defaults to the email parsed from `MAIL_FROM`). |
+| `MAIL_MESSAGE_ID_DOMAIN` | Optional. Domain for `Message-ID` headers (defaults to host from `PUBLIC_SITE_URL`, else domain from `MAIL_FROM`). |
 | `SMTP_HOST` | SMTP server hostname. |
 | `SMTP_PORT` | Port (usually `587` or `465`). |
 | `SMTP_SECURE` | `true` / `1` for TLS on connect (often used with port `465`). |
@@ -85,11 +87,20 @@ If you do not get a `refresh_token`, revoke the app under [Google Account → Th
 
 ## Logo in emails
 
-Emails use an **inline attached logo** (CID) when a file exists under `public/images/`, in this order:
+Emails embed the logo as an **inline raster image** (CID) for maximum compatibility. **SVG is not used** — Gmail and others often break inline SVG.
 
-1. `qimora.png` (best compatibility in Gmail and Outlook)
-2. `qimora-logo.svg` (used if PNG is missing; some clients show SVG less reliably)
+Raster files are checked under `public/images/` in this order:
 
-If neither file exists, the template falls back to `{PUBLIC_SITE_URL}/images/qimora.png` (must be a real, reachable URL).
+1. `qimora.png` (recommended)
+2. `qimora-email.png`
+3. `logo-email.png`
+
+If none exist, the HTML uses `{PUBLIC_SITE_URL}/images/qimora.png` (that URL must return a real PNG/JPEG in production).
+
+Optional env: `MAIL_REPLY_TO`, `MAIL_MESSAGE_ID_DOMAIN` (defaults from `PUBLIC_SITE_URL` / `MAIL_FROM`).
 
 Footer links (website, “Visit website”) still use **`PUBLIC_SITE_URL`**, so keep it set to your live or ngrok base URL with **no** trailing slash.
+
+### If mail lands in spam
+
+DNS for your sending domain must pass **SPF**, **DKIM**, and **DMARC** (your host or Google Workspace admin panel). Google Postmaster Tools can show domain reputation. Transactional copy and a clear **Reply-To** matching your domain help; the app sets **Reply-To** from `MAIL_REPLY_TO` or the address in `MAIL_FROM`.
