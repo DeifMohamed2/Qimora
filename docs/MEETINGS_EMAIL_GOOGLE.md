@@ -8,15 +8,14 @@ This app can (1) email guests when they book and when an admin confirms, and (2)
 
 | Variable | Purpose |
 |----------|---------|
-| `PUBLIC_SITE_URL` | Public site base URL **without** trailing slash (e.g. `https://qimora.com`). Used for **links**, **fallback logo URL**, and **Message-ID domain** when not overridden. |
-| `MAIL_REPLY_TO` | Optional. Reply-To address for outbound mail (defaults to the email parsed from `MAIL_FROM`). |
-| `MAIL_MESSAGE_ID_DOMAIN` | Optional. Domain for `Message-ID` headers (defaults to host from `PUBLIC_SITE_URL`, else domain from `MAIL_FROM`). |
+| `PUBLIC_SITE_URL` | Public site base URL **without** trailing slash (e.g. `https://qimora.com`). Used for the **Qimora logo** in HTML emails (`/images/qimora.png`). |
 | `SMTP_HOST` | SMTP server hostname. |
 | `SMTP_PORT` | Port (usually `587` or `465`). |
 | `SMTP_SECURE` | `true` / `1` for TLS on connect (often used with port `465`). |
 | `SMTP_USER` | SMTP username (often same as sender). |
 | `SMTP_PASS` | SMTP password or API key (provider-specific). |
-| `MAIL_FROM` | From header, e.g. `"Qimora <hello@yourdomain.com>"`. |
+| `MAIL_FROM` | From header, e.g. `"Qimora <hello@yourdomain.com>"`. Must match a domain your SMTP provider signs (DKIM) and authorizes (SPF). |
+| `MAIL_REPLY_TO` | Optional. Replies go here (e.g. `info@qimora.io`). Recommended so confirmations are not “noreply-only,” which helps legitimacy. |
 | `GOOGLE_CLIENT_ID` | OAuth 2.0 Client ID from Google Cloud. |
 | `GOOGLE_CLIENT_SECRET` | OAuth client secret. |
 | `GOOGLE_REFRESH_TOKEN` | Long-lived refresh token for the calendar owner account (see below). |
@@ -36,6 +35,13 @@ Use a transactional provider for reliable delivery:
 3. **Resend / Postmark / etc.** — Each documents SMTP host, port, and API key as password.
 
 Verify your **sending domain** (SPF/DKIM) so messages are not marked as spam.
+
+**If mail still lands in Spam:** Gmail’s “similar to past spam” message is usually **authentication or reputation**, not HTML wording alone.
+
+1. In your DNS for the domain in `MAIL_FROM`: **SPF** includes your SMTP provider; **DKIM** is enabled in the provider dashboard and matches the sending domain; **DMARC** exists (start with `p=none` and monitor).
+2. Send a test from production and open **Show original** in Gmail — look for **SPF/DKIM = PASS** (and DMARC aligned).
+3. Use a **transactional provider** (SendGrid, Mailgun, Postmark, Resend, etc.) instead of a generic SMTP forwarder when possible.
+4. Keep `PUBLIC_SITE_URL` as your real **https** site so logo fallbacks use a valid URL if inline CID fails.
 
 **Local testing:** Leave `SMTP_HOST` empty → no email is sent; booking and confirm flows still work (admin flash will note when SMTP is off).
 
@@ -87,20 +93,11 @@ If you do not get a `refresh_token`, revoke the app under [Google Account → Th
 
 ## Logo in emails
 
-Emails embed the logo as an **inline raster image** (CID) for maximum compatibility. **SVG is not used** — Gmail and others often break inline SVG.
+Emails use an **inline attached logo** (CID) when a raster file exists under `public/images/`, in this order:
 
-Raster files are checked under `public/images/` in this order:
+1. `qimora.png` (best compatibility in Gmail and Outlook)
+2. `qimora.jpg` / `qimora.jpeg`
 
-1. `qimora.png` (recommended)
-2. `qimora-email.png`
-3. `logo-email.png`
-
-If none exist, the HTML uses `{PUBLIC_SITE_URL}/images/qimora.png` (that URL must return a real PNG/JPEG in production).
-
-Optional env: `MAIL_REPLY_TO`, `MAIL_MESSAGE_ID_DOMAIN` (defaults from `PUBLIC_SITE_URL` / `MAIL_FROM`).
+SVG is **not** embedded — many clients block remote SVG in `<img>`. If no raster file exists, the template falls back to `{PUBLIC_SITE_URL}/images/qimora.png` (must be a real, reachable **https** URL).
 
 Footer links (website, “Visit website”) still use **`PUBLIC_SITE_URL`**, so keep it set to your live or ngrok base URL with **no** trailing slash.
-
-### If mail lands in spam
-
-DNS for your sending domain must pass **SPF**, **DKIM**, and **DMARC** (your host or Google Workspace admin panel). Google Postmaster Tools can show domain reputation. Transactional copy and a clear **Reply-To** matching your domain help; the app sets **Reply-To** from `MAIL_REPLY_TO` or the address in `MAIL_FROM`.

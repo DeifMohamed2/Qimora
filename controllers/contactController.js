@@ -60,7 +60,7 @@ exports.submitContact = async (req, res) => {
       const logo = getBrandedLogoEmailParts(siteUrl);
       const mailResult = await sendMailSafe({
         to: visitorEmail,
-        subject: 'We received your message — Qimora',
+        subject: 'Your message was received — Qimora',
         html: contactReceivedHtml(
           {
             name: String(name || '').trim(),
